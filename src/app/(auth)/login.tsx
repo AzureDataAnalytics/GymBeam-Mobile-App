@@ -142,6 +142,27 @@ export default function LoginScreen() {
           </Link>
         </View>
 
+        {/* TEMP: preview entry points that skip sign-in; remove before release. */}
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            gap: theme.spacing.lg,
+            marginTop: theme.spacing.lg,
+          }}
+        >
+          <Link href="/exercises/create">
+            <Text color="link" variant="caption">
+              Preview: Create Drill
+            </Text>
+          </Link>
+          <Link href="/runs/multi-point">
+            <Text color="link" variant="caption">
+              Preview: Multi Point Run
+            </Text>
+          </Link>
+        </View>
+
         <AuthTermsNotice />
       </View>
     </Screen>
