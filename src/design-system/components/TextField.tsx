@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, type ReactNode } from 'react';
 import { TextInput, type TextInputProps, View } from 'react-native';
 
 import { useTheme } from '../theme';
@@ -6,11 +6,13 @@ import { Text } from './Text';
 
 export interface TextFieldProps extends TextInputProps {
   label: string;
+  hideLabel?: boolean;
+  trailing?: ReactNode;
   errorMessage?: string;
 }
 
 export const TextField = forwardRef<TextInput, TextFieldProps>(function TextField(
-  { label, errorMessage, style, ...rest },
+  { label, hideLabel = false, trailing, errorMessage, placeholder, style, ...rest },
   ref,
 ) {
   const theme = useTheme();
@@ -18,29 +20,43 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
 
   return (
     <View style={{ gap: theme.spacing.xs }}>
-      <Text variant="label" color="secondary">
-        {label}
-      </Text>
-      <TextInput
-        ref={ref}
-        accessibilityLabel={label}
-        placeholderTextColor={theme.colors.textSecondary}
-        style={[
-          {
-            borderWidth: 1,
-            borderColor: hasError ? theme.colors.danger : theme.colors.border,
-            borderRadius: theme.radius.md,
-            paddingHorizontal: theme.spacing.md,
-            paddingVertical: theme.spacing.sm,
-            fontSize: theme.typography.size.md,
-            color: theme.colors.textPrimary,
-            backgroundColor: theme.colors.surface,
-            minHeight: 48,
-          },
-          style,
-        ]}
-        {...rest}
-      />
+      {hideLabel ? null : (
+        <Text variant="label" color="secondary">
+          {label}
+        </Text>
+      )}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          borderWidth: 1,
+          borderColor: hasError ? theme.colors.danger : theme.colors.border,
+          borderRadius: theme.radius.md,
+          backgroundColor: theme.colors.surface,
+          minHeight: hideLabel ? 56 : 48,
+          paddingRight: trailing ? theme.spacing.md : 0,
+        }}
+      >
+        <TextInput
+          ref={ref}
+          accessibilityLabel={label}
+          placeholder={placeholder ?? (hideLabel ? label : undefined)}
+          placeholderTextColor={theme.colors.textSecondary}
+          style={[
+            {
+              flex: 1,
+              alignSelf: 'stretch',
+              paddingHorizontal: theme.spacing.lg,
+              paddingVertical: theme.spacing.sm,
+              fontSize: theme.typography.size.md,
+              color: theme.colors.textPrimary,
+            },
+            style,
+          ]}
+          {...rest}
+        />
+        {trailing}
+      </View>
       {hasError ? (
         <Text variant="caption" color="danger">
           {errorMessage}

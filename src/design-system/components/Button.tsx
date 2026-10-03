@@ -1,14 +1,16 @@
+import { type ReactNode } from 'react';
 import { ActivityIndicator, Pressable, type PressableProps, StyleSheet } from 'react-native';
 
 import { minTouchTarget } from '../tokens';
 import { useTheme } from '../theme';
 import { Text } from './Text';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+export type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'outline' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends Omit<PressableProps, 'style'> {
   label: string;
+  icon?: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
@@ -23,6 +25,7 @@ const SIZE_MAP: Record<ButtonSize, { paddingVertical: number; paddingHorizontal:
 
 export function Button({
   label,
+  icon,
   variant = 'primary',
   size = 'md',
   loading = false,
@@ -38,6 +41,7 @@ export function Button({
     { background: string; text: string; border?: string }
   > = {
     primary: { background: theme.colors.tint, text: theme.colors.textInverse },
+    accent: { background: theme.colors.accent, text: theme.colors.onAccent },
     secondary: { background: theme.colors.surfaceRaised, text: theme.colors.textPrimary },
     outline: {
       background: 'transparent',
@@ -73,9 +77,12 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={style.text} />
       ) : (
-        <Text variant="bodyStrong" style={{ color: style.text }}>
-          {label}
-        </Text>
+        <>
+          {icon}
+          <Text variant="bodyStrong" style={{ color: style.text }}>
+            {label}
+          </Text>
+        </>
       )}
     </Pressable>
   );
