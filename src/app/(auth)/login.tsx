@@ -1,14 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, router } from 'expo-router';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { View } from 'react-native';
 import { z } from 'zod';
 
 import { Button, Screen, Text, TextField, useTheme } from '@/design-system';
+import {
+  AuthLogo,
+  AuthTermsNotice,
+  PasswordVisibilityToggle,
+  SocialSignInButtons,
+} from '@/features/auth/AuthFormParts';
 import { useAuthStore } from '@/state/authStore';
 
 const schema = z.object({
-  username: z.string().min(1, 'Enter your username'),
+  email: z.string().trim().min(1, 'Enter your email'),
   password: z.string().min(1, 'Enter your password'),
 });
 
@@ -19,6 +26,7 @@ export default function LoginScreen() {
   const login = useAuthStore((state) => state.login);
   const error = useAuthStore((state) => state.error);
   const isSubmitting = useAuthStore((state) => state.isSubmitting);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const {
     control,
@@ -26,7 +34,7 @@ export default function LoginScreen() {
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { username: '', password: '' },
+    defaultValues: { email: '', password: '' },
   });
 
   const onSubmit = handleSubmit(async (values) => {
@@ -40,52 +48,122 @@ export default function LoginScreen() {
 
   return (
     <Screen scroll>
-      <View style={{ gap: theme.spacing.lg, marginTop: theme.spacing.xl }}>
-        <Text variant="title">Sign in</Text>
+      <View style={{ flex: 1, paddingTop: theme.spacing.xxl }}>
+        <AuthLogo />
 
-        <Controller
-          control={control}
-          name="username"
-          render={({ field }) => (
-            <TextField
-              label="Username"
-              autoCapitalize="none"
-              autoComplete="username"
-              value={field.value}
-              onChangeText={field.onChange}
-              errorMessage={errors.username?.message}
-            />
-          )}
-        />
+        <View style={{ gap: theme.spacing.xl, marginTop: theme.spacing.xxxl }}>
+          <Controller
+            control={control}
+            name="email"
+            render={({ field }) => (
+              <TextField
+                label="Email"
+                hideLabel
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="email-address"
+                autoComplete="email"
+                textContentType="emailAddress"
+                returnKeyType="next"
+                value={field.value}
+                onChangeText={field.onChange}
+                onBlur={field.onBlur}
+                errorMessage={errors.email?.message}
+              />
+            )}
+          />
 
-        <Controller
-          control={control}
-          name="password"
-          render={({ field }) => (
-            <TextField
-              label="Password"
-              secureTextEntry
-              autoComplete="password"
-              value={field.value}
-              onChangeText={field.onChange}
-              errorMessage={errors.password?.message}
-            />
-          )}
-        />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field }) => (
+              <TextField
+                label="Password"
+                hideLabel
+                secureTextEntry={!passwordVisible}
+                autoCapitalize="none"
+                autoComplete="password"
+                textContentType="password"
+                returnKeyType="go"
+                onSubmitEditing={onSubmit}
+                value={field.value}
+                onChangeText={field.onChange}
+                onBlur={field.onBlur}
+                errorMessage={errors.password?.message}
+                trailing={
+                  <PasswordVisibilityToggle
+                    visible={passwordVisible}
+                    onToggle={() => setPasswordVisible((visible) => !visible)}
+                  />
+                }
+              />
+            )}
+          />
+        </View>
+
+        <Link
+          href="/(auth)/forgot-password"
+          style={{ alignSelf: 'flex-end', marginTop: theme.spacing.md }}
+        >
+          <Text color="link">Forgot Password?</Text>
+        </Link>
 
         {error ? (
-          <Text color="danger" variant="caption">
+          <Text color="danger" variant="caption" style={{ marginTop: theme.spacing.md }}>
             {error}
           </Text>
         ) : null}
 
-        <Button label="Sign in" onPress={onSubmit} loading={isSubmitting} fullWidth />
+        <View style={{ marginTop: theme.spacing.xl }}>
+          <Button
+            label="Sign In"
+            variant="accent"
+            size="lg"
+            onPress={onSubmit}
+            loading={isSubmitting}
+            fullWidth
+          />
+        </View>
 
-        <Link href="/(auth)/forgot-password">
-          <Text color="tint" variant="caption">
-            Forgot password?
-          </Text>
-        </Link>
+        <SocialSignInButtons />
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            gap: theme.spacing.sm,
+            marginTop: theme.spacing.xl,
+          }}
+        >
+          <Text>You don’t have an account?</Text>
+          {/* `replace` so toggling between login and register doesn't keep growing the stack. */}
+          <Link href="/(auth)/register" replace>
+            <Text color="link">Sign Up</Text>
+          </Link>
+        </View>
+
+        {/* TEMP: preview entry points that skip sign-in; remove before release. */}
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            gap: theme.spacing.lg,
+            marginTop: theme.spacing.lg,
+          }}
+        >
+          <Link href="/exercises/create">
+            <Text color="link" variant="caption">
+              Preview: Create Drill
+            </Text>
+          </Link>
+          <Link href="/runs/multi-point">
+            <Text color="link" variant="caption">
+              Preview: Multi Point Run
+            </Text>
+          </Link>
+        </View>
+
+        <AuthTermsNotice />
       </View>
     </Screen>
   );

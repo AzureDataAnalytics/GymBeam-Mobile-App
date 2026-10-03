@@ -30,7 +30,7 @@ simulator if you have one configured locally.
 By default `EXPO_PUBLIC_ENABLE_MOCK_DEVICE=true`, so Devices/Sessions work
 immediately against a simulated GymBeam unit — no Pi, no Bluetooth, and no
 backend needed to develop the UI. Auth is local-only (on-device accounts via
-`expo-secure-store`) — sign up with any username/password, no network call
+`expo-secure-store`) — sign up with any email/password, no network call
 is made.
 
 ## Scripts

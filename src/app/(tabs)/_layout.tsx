@@ -1,18 +1,8 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Redirect, Tabs } from 'expo-router';
 
 import { useTheme } from '@/design-system';
 import { useAuthStore } from '@/state/authStore';
-
-type IoniconName = keyof typeof Ionicons.glyphMap;
-
-const TAB_ICONS: Record<string, IoniconName> = {
-  index: 'home',
-  exercises: 'barbell',
-  sessions: 'flash',
-  devices: 'hardware-chip',
-  profile: 'person',
-};
 
 export default function TabsLayout() {
   const theme = useTheme();
@@ -24,24 +14,43 @@ export default function TabsLayout() {
 
   return (
     <Tabs
-      screenOptions={({ route }) => ({
+      screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme.colors.tint,
+        tabBarActiveTintColor: theme.colors.accent,
         tabBarInactiveTintColor: theme.colors.textSecondary,
         tabBarStyle: {
           backgroundColor: theme.colors.surface,
           borderTopColor: theme.colors.border,
         },
-        tabBarIcon: ({ color, size }) => (
-          <Ionicons name={TAB_ICONS[route.name] ?? 'ellipse'} color={color} size={size} />
-        ),
-      })}
+      }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Home' }} />
-      <Tabs.Screen name="exercises" options={{ title: 'Exercises' }} />
-      <Tabs.Screen name="sessions" options={{ title: 'Sessions' }} />
-      <Tabs.Screen name="devices" options={{ title: 'Devices' }} />
-      <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color, size }) => <Ionicons name="home" color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="drill"
+        options={{
+          title: 'Drill',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="run-fast" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color, size }) => <Ionicons name="person" color={color} size={size} />,
+        }}
+      />
+      {/* Not in the tab bar; still routable (Home links to them). */}
+      <Tabs.Screen name="exercises" options={{ href: null }} />
+      <Tabs.Screen name="sessions" options={{ href: null }} />
+      <Tabs.Screen name="devices" options={{ href: null }} />
     </Tabs>
   );
 }
