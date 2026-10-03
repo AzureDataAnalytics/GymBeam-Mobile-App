@@ -68,6 +68,15 @@ const palette = {
     500: '#D98A11',
     600: '#B5720C',
   },
+  pink: {
+    500: '#FF3380',
+    600: '#E0226B',
+  },
+  teal: {
+    300: '#4FC3B0',
+    500: '#17A99B',
+    700: '#0B5F52',
+  },
   red: {
     500: '#E3453B',
     600: '#C0362D',
@@ -100,6 +109,15 @@ export interface SemanticColors {
   textInverse: string;
   tint: string;
   tintPressed: string;
+  /** High-emphasis call to action (e.g. auth screen submit). */
+  accent: string;
+  accentPressed: string;
+  /** Text/icons drawn on top of `accent`. */
+  onAccent: string;
+  /** Inline text links. */
+  link: string;
+  /** Drill target markers and the path between them. */
+  target: string;
   success: string;
   warning: string;
   danger: string;
@@ -120,6 +138,11 @@ export const colors: Record<ColorScheme, SemanticColors> = {
     textInverse: palette.neutral[0],
     tint: palette.blue[500],
     tintPressed: palette.blue[600],
+    accent: palette.pink[500],
+    accentPressed: palette.pink[600],
+    onAccent: palette.neutral[0],
+    link: palette.teal[700],
+    target: palette.teal[500],
     success: palette.green[500],
     warning: palette.amber[500],
     danger: palette.red[500],
@@ -137,6 +160,11 @@ export const colors: Record<ColorScheme, SemanticColors> = {
     textInverse: palette.neutral[950],
     tint: palette.blue[500],
     tintPressed: palette.blue[600],
+    accent: palette.pink[500],
+    accentPressed: palette.pink[600],
+    onAccent: palette.neutral[0],
+    link: palette.teal[300],
+    target: palette.teal[500],
     success: palette.green[500],
     warning: palette.amber[500],
     danger: palette.red[500],

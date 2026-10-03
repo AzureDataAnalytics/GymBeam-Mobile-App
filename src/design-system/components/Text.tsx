@@ -7,7 +7,7 @@ export type TextVariant =
 
 export interface TextProps extends RNTextProps {
   variant?: TextVariant;
-  color?: 'primary' | 'secondary' | 'inverse' | 'tint' | 'danger' | 'success' | 'warning';
+  color?: 'primary' | 'secondary' | 'inverse' | 'tint' | 'link' | 'danger' | 'success' | 'warning';
 }
 
 const VARIANT_MAP: Record<
@@ -33,6 +33,7 @@ export function Text({ variant = 'body', color = 'primary', style, ...rest }: Te
     secondary: theme.colors.textSecondary,
     inverse: theme.colors.textInverse,
     tint: theme.colors.tint,
+    link: theme.colors.link,
     danger: theme.colors.danger,
     success: theme.colors.success,
     warning: theme.colors.warning,
