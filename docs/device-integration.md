@@ -120,6 +120,48 @@ if its advertised name contains "GymBeam".
 Adding `react-native-ble-plx` changed the native project, so a **new
 development build is required** before real scanning works.
 
+## Connecting over Wi-Fi
+
+The Connect GymBeam screen also offers two network options, both using
+`WifiTransport` (a WebSocket) instead of Bluetooth. They work on Android
+**and iPhone**, and need no pairing.
+
+- **Wi-Fi (shared network):** phone and Pi are both on the gym's Wi-Fi.
+  Default address `gymbeam.local`. The network must allow client-to-client
+  traffic — guest networks and "AP/client isolation" block it — and someone
+  has to join the Pi to that network first.
+- **Hotspot:** the Pi runs its own Wi-Fi network and the phone joins it.
+  Default address `192.168.4.1`. The phone has no internet while joined.
+  The user joins the network themselves in the phone's Wi-Fi settings; the
+  app doesn't switch networks.
+
+The address is editable on the screen (`host` or `host:port`, default port
+8765) and is remembered as the chosen device.
+
+### What the Pi must run (does not exist yet)
+
+**The current firmware has no network server, so neither Wi-Fi option can
+reach a real unit until this is added on the Pi side.**
+
+- A WebSocket server on port **8765**, plain `ws://` (local network only).
+- Each **text frame is exactly one JSON object** — the same commands and
+  events listed at the top of this document (`Drill`, `Drill_preview`,
+  `Drill_Stop`, `Time`; `device_info`, `system_info`, `Drill_result`).
+  WebSocket frames replace the "no delimiter" problem Bluetooth has.
+- On connect the app sends `Time` first, as it does over Bluetooth.
+- For the shared-network option, advertise the hostname `gymbeam.local`
+  (mDNS/Avahi), or give users the Pi's IP address. Android only resolves
+  `.local` names on Android 12+; older phones need the IP.
+- For the hotspot option, the Pi's access point should use a network name
+  starting with `GymBeam` (the screen tells users to look for that) and the
+  gateway address `192.168.4.1`. If the Pi's hotspot uses another address
+  (NetworkManager defaults to `10.42.0.1`), change `DEFAULT_HOTSPOT_HOST` in
+  `src/services/device-transport/wifiAddress.ts`.
+
+App-side native settings this needed (so a **new development build** is
+required): Android `usesCleartextTraffic` via `expo-build-properties`, and
+on iOS `NSLocalNetworkUsageDescription` plus `NSAllowsLocalNetworking`.
+
 ## Architecture
 
 `src/services/device-transport/`:
@@ -127,6 +169,8 @@ development build is required** before real scanning works.
 - `MockDeviceTransport.ts` — simulated device, used on iOS always and on
   Android when `EXPO_PUBLIC_ENABLE_MOCK_DEVICE=true`. Never touches hardware.
 - `BluetoothClassicTransport.ts` — the real Android implementation.
+- `WifiTransport.ts` — WebSocket transport for the Wi-Fi and hotspot options (both platforms).
+- `wifiAddress.ts` — pure, unit-tested parsing of the Pi's `host:port` address.
 - `jsonFraming.ts` — pure, unit-tested stream reassembly (see above).
 - `piProtocol.ts` — pure, unit-tested command builders + response parsers/normalizers.
 - `nativeBluetooth.ts` — lists OS-bonded devices (for the pairing screen).
