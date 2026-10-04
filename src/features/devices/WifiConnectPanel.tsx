@@ -12,6 +12,8 @@ import {
 } from '@/services/device-transport/wifiAddress';
 import { useDeviceStore } from '@/state/deviceStore';
 
+import { ConnectPulse } from './ConnectPulse';
+
 export type WifiMode = 'shared' | 'hotspot';
 
 const COPY: Record<
@@ -87,18 +89,7 @@ export function WifiConnectPanel({ mode }: { mode: WifiMode }) {
   return (
     <View style={{ gap: theme.spacing.xl }}>
       <View style={{ alignItems: 'center', gap: theme.spacing.md }}>
-        <View
-          style={{
-            width: 72,
-            height: 72,
-            borderRadius: theme.radius.full,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: theme.colors.target,
-          }}
-        >
-          <Ionicons name={copy.icon} size={36} color={theme.colors.onAccent} />
-        </View>
+        <ConnectPulse icon={copy.icon} active />
         <Text variant="title" style={{ textAlign: 'center' }}>
           {copy.title}
         </Text>

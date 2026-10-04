@@ -1,7 +1,7 @@
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Animated, Easing, Platform, View } from 'react-native';
+import { useState } from 'react';
+import { Platform, View } from 'react-native';
 
 import { Badge, Button, Card, EmptyState, Text, useTheme } from '@/design-system';
 import { proximityFor } from '@/services/device-discovery/beaconParsing';
@@ -9,6 +9,7 @@ import type { DiscoveredBeacon } from '@/services/device-discovery/beaconScanner
 import { ensureBonded } from '@/services/device-transport/nativeBluetooth';
 import { useDeviceStore } from '@/state/deviceStore';
 
+import { ConnectPulse } from './ConnectPulse';
 import { type BeaconScanStatus, useBeaconScan } from './useBeaconScan';
 
 const PROXIMITY_LABEL = {
@@ -84,7 +85,7 @@ export function BluetoothConnectPanel() {
   return (
     <View style={{ gap: theme.spacing.xl }}>
       <View style={{ alignItems: 'center', gap: theme.spacing.md }}>
-        <ScanPulse active={isScanning} />
+        <ConnectPulse icon="bluetooth" active={isScanning} />
         <Text variant="title" style={{ textAlign: 'center' }}>
           {isScanning
             ? beacons.length > 0
@@ -207,56 +208,4 @@ function signalIcon(rssi: number): keyof typeof MaterialCommunityIcons.glyphMap 
   if (rssi >= -75) return 'signal-cellular-2';
   if (rssi >= -90) return 'signal-cellular-1';
   return 'signal-cellular-outline';
-}
-
-function ScanPulse({ active }: { active: boolean }) {
-  const theme = useTheme();
-  const [progress] = useState(() => new Animated.Value(0));
-
-  useEffect(() => {
-    if (!active) {
-      progress.setValue(0);
-      return;
-    }
-    const loop = Animated.loop(
-      Animated.timing(progress, {
-        toValue: 1,
-        duration: 1800,
-        easing: Easing.out(Easing.quad),
-        useNativeDriver: true,
-      }),
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [active, progress]);
-
-  return (
-    <View style={{ width: 160, height: 160, alignItems: 'center', justifyContent: 'center' }}>
-      <Animated.View
-        style={{
-          position: 'absolute',
-          width: 160,
-          height: 160,
-          borderRadius: theme.radius.full,
-          backgroundColor: theme.colors.target,
-          opacity: progress.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0] }),
-          transform: [
-            { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [0.45, 1] }) },
-          ],
-        }}
-      />
-      <View
-        style={{
-          width: 72,
-          height: 72,
-          borderRadius: theme.radius.full,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: theme.colors.target,
-        }}
-      >
-        <Ionicons name="bluetooth" size={36} color={theme.colors.onAccent} />
-      </View>
-    </View>
-  );
 }
