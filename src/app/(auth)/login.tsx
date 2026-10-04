@@ -136,16 +136,15 @@ export default function LoginScreen() {
           }}
         >
           <Text>You don’t have an account?</Text>
-          {/* `replace` so toggling between login and register doesn't keep growing the stack. */}
           <Link href="/(auth)/register" replace>
             <Text color="link">Sign Up</Text>
           </Link>
         </View>
 
-        {/* TEMP: preview entry points that skip sign-in; remove before release. */}
         <View
           style={{
             flexDirection: 'row',
+            flexWrap: 'wrap',
             justifyContent: 'center',
             gap: theme.spacing.lg,
             marginTop: theme.spacing.lg,
@@ -154,6 +153,11 @@ export default function LoginScreen() {
           <Link href="/exercises/create">
             <Text color="link" variant="caption">
               Preview: Create Drill
+            </Text>
+          </Link>
+          <Link href="/devices/connect">
+            <Text color="link" variant="caption">
+              Preview: Connect Device
             </Text>
           </Link>
           <Link href="/runs/multi-point">
