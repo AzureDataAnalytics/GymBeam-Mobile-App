@@ -90,6 +90,15 @@ export default function DevicesScreen() {
           </Card>
         ) : null}
 
+        {isConnected ? null : (
+          <Button
+            label="Find my GymBeam"
+            variant="accent"
+            onPress={() => router.push('/devices/connect')}
+            fullWidth
+          />
+        )}
+
         {Platform.OS === 'android' && !isMock ? (
           <Button
             label={pairedMacAddress ? 'Change paired device' : 'Pair a device'}

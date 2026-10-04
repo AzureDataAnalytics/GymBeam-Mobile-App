@@ -6,12 +6,6 @@ export interface BondedDeviceSummary {
   address: string;
 }
 
-/**
- * Lists devices already paired at the OS level. The Pi must be paired via
- * Android's Bluetooth settings first (same prerequisite the legacy Flutter
- * app had) — this app doesn't do discovery/pairing itself, only picks among
- * already-bonded devices. See docs/device-integration.md.
- */
 export async function listBondedDevices(): Promise<BondedDeviceSummary[]> {
   if (Platform.OS !== 'android') return [];
 
@@ -22,4 +16,13 @@ export async function listBondedDevices(): Promise<BondedDeviceSummary[]> {
 export async function isBluetoothEnabled(): Promise<boolean> {
   if (Platform.OS !== 'android') return false;
   return RNBluetoothClassic.isBluetoothEnabled();
+}
+
+export async function ensureBonded(address: string): Promise<void> {
+  if (Platform.OS !== 'android') return;
+
+  const bonded = await RNBluetoothClassic.getBondedDevices();
+  if (bonded.some((device) => device.address.toUpperCase() === address.toUpperCase())) return;
+
+  await RNBluetoothClassic.pairDevice(address);
 }

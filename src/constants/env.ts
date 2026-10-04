@@ -1,25 +1,22 @@
 import { z } from 'zod';
 
-/**
- * All EXPO_PUBLIC_* vars are inlined at build time and ship inside the client
- * bundle — never put secrets here.
- *
- * There is no backend right now (that's a deliberate, later phase — see
- * docs/api-integration.md). This config intentionally has no API/WS URL
- * until that phase starts; everything today is either on-device (auth,
- * storage) or device-transport (mock, or Bluetooth Classic later).
- */
 const envSchema = z.object({
   EXPO_PUBLIC_ENVIRONMENT: z.enum(['development', 'staging', 'production']).default('development'),
   EXPO_PUBLIC_ENABLE_MOCK_DEVICE: z
     .enum(['true', 'false'])
     .default('true')
     .transform((value) => value === 'true'),
+  EXPO_PUBLIC_BEACON_UUID: z
+    .string()
+    .trim()
+    .optional()
+    .transform((value) => value || null),
 });
 
 const parsed = envSchema.safeParse({
   EXPO_PUBLIC_ENVIRONMENT: process.env.EXPO_PUBLIC_ENVIRONMENT,
   EXPO_PUBLIC_ENABLE_MOCK_DEVICE: process.env.EXPO_PUBLIC_ENABLE_MOCK_DEVICE,
+  EXPO_PUBLIC_BEACON_UUID: process.env.EXPO_PUBLIC_BEACON_UUID,
 });
 
 if (!parsed.success) {
@@ -31,6 +28,7 @@ if (!parsed.success) {
 export const env = {
   environment: parsed.data.EXPO_PUBLIC_ENVIRONMENT,
   enableMockDevice: parsed.data.EXPO_PUBLIC_ENABLE_MOCK_DEVICE,
+  beaconUuid: parsed.data.EXPO_PUBLIC_BEACON_UUID,
   isDevelopment: parsed.data.EXPO_PUBLIC_ENVIRONMENT === 'development',
   isProduction: parsed.data.EXPO_PUBLIC_ENVIRONMENT === 'production',
 } as const;

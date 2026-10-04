@@ -16,7 +16,6 @@ interface CreateExerciseScreenProps {
   edges?: Edge[];
 }
 
-
 export function CreateExerciseScreen({
   showBack = false,
   edges = ['top', 'bottom', 'left', 'right'],
@@ -46,7 +45,10 @@ export function CreateExerciseScreen({
 
   const startDrill = async () => {
     if (connectionState !== 'ready') {
-      Alert.alert('No device connected', 'Connect your GymBeam device to start a drill.');
+      Alert.alert('No device connected', 'Connect your GymBeam device to start a drill.', [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Connect', onPress: () => router.push('/devices/connect') },
+      ]);
       return;
     }
     try {
