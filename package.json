@@ -8,6 +8,7 @@
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~57.0.24",
     "expo-application": "~57.0.3",
+    "expo-build-properties": "~57.0.22",
     "expo-constants": "~57.0.19",
     "expo-crypto": "~57.0.3",
     "expo-device": "~57.0.2",
@@ -23,6 +24,7 @@
     "react": "19.2.3",
     "react-hook-form": "^7.88.0",
     "react-native": "0.86.3",
+    "react-native-ble-plx": "^3.5.1",
     "react-native-bluetooth-classic": "^1.73.0-rc.17",
     "react-native-gesture-handler": "~2.32.0",
     "react-native-safe-area-context": "~5.7.0",
@@ -50,7 +52,9 @@
   "expo": {
     "doctor": {
       "reactNativeDirectoryCheck": {
-        "exclude": ["react-native-bluetooth-classic"]
+        "exclude": [
+          "react-native-bluetooth-classic"
+        ]
       }
     }
   },

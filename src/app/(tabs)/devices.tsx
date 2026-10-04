@@ -12,6 +12,8 @@ export default function DevicesScreen() {
   const disconnect = useDeviceStore((state) => state.disconnect);
   const isMock = useDeviceStore((state) => state.transport.isMock);
   const pairedMacAddress = useDeviceStore((state) => state.pairedMacAddress);
+  const wifiAddress = useDeviceStore((state) => state.wifiAddress);
+  const hasDevice = Boolean(pairedMacAddress || wifiAddress);
   const latestMetrics = useDeviceStore((state) => state.latestMetrics);
 
   const isBusy = connectionState === 'connecting';
@@ -34,7 +36,11 @@ export default function DevicesScreen() {
             <View style={{ gap: theme.spacing.xxs }}>
               <Text variant="subtitle">GymBeam Trainer</Text>
               <Text variant="caption" color="secondary">
-                {isMock ? 'Simulated device' : (pairedMacAddress ?? 'No device paired')}
+                {isMock
+                  ? 'Simulated device'
+                  : wifiAddress
+                    ? `Wi-Fi · ${wifiAddress}`
+                    : (pairedMacAddress ?? 'No device paired')}
               </Text>
             </View>
             <Badge
@@ -53,15 +59,15 @@ export default function DevicesScreen() {
               label={isConnected ? 'Disconnect' : 'Connect'}
               variant={isConnected ? 'outline' : 'primary'}
               loading={isBusy}
-              disabled={!isMock && !pairedMacAddress}
+              disabled={!isMock && !hasDevice}
               onPress={isConnected ? disconnect : connect}
               fullWidth
             />
           )}
 
-          {!isMock && !pairedMacAddress ? (
+          {!isMock && !hasDevice ? (
             <Text variant="caption" color="warning">
-              Pair a device before connecting.
+              Choose a device before connecting.
             </Text>
           ) : null}
         </Card>
@@ -89,6 +95,15 @@ export default function DevicesScreen() {
             </View>
           </Card>
         ) : null}
+
+        {isConnected ? null : (
+          <Button
+            label="Find my GymBeam"
+            variant="accent"
+            onPress={() => router.push('/devices/connect')}
+            fullWidth
+          />
+        )}
 
         {Platform.OS === 'android' && !isMock ? (
           <Button

@@ -13,7 +13,11 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.gymbeam.trainer",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocalNetworkUsageDescription": "GymBeam connects to your GymBeam unit over the local Wi-Fi network.",
+        "NSAppTransportSecurity": {
+          "NSAllowsLocalNetworking": true
+        }
       }
     },
     "android": {
@@ -53,7 +57,16 @@
           "color": "#0B5FFF"
         }
       ],
-      "expo-font"
+      "expo-font",
+      "react-native-ble-plx",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

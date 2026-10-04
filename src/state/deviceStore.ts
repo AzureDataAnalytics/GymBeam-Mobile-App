@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { nextSessionState } from '@/features/sessions/sessionStateMachine';
 import {
   createDeviceTransport,
+  type DeviceLink,
   type DeviceTransport,
   type DrillSpec,
 } from '@/services/device-transport';
@@ -19,10 +20,11 @@ interface DeviceState {
   telemetryLog: TelemetryEvent[];
   latestMetrics: DeviceSystemMetrics | null;
   pairedMacAddress: string | null;
+  wifiAddress: string | null;
 
   hydrate: () => Promise<void>;
-  /** Pass null to un-pair and fall back to the mock device. */
   setPairedDevice: (address: string | null) => Promise<void>;
+  setWifiDevice: (address: string | null) => Promise<void>;
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   sendDrill: (spec: DrillSpec) => Promise<void>;
@@ -57,6 +59,31 @@ export const useDeviceStore = create<DeviceState>((set, get) => {
   const initialTransport = createDeviceTransport();
   detachCurrentTransportListeners = attachTransportListeners(initialTransport, set);
 
+  const switchLink = async (link: Required<DeviceLink>) => {
+    await get()
+      .transport.disconnect()
+      .catch(() => {});
+    detachCurrentTransportListeners?.();
+
+    await Promise.all([
+      deviceStorage.setPairedMacAddress(link.macAddress),
+      deviceStorage.setWifiAddress(link.wifiAddress),
+    ]);
+
+    const nextTransport = createDeviceTransport(link);
+    detachCurrentTransportListeners = attachTransportListeners(nextTransport, set);
+
+    set({
+      transport: nextTransport,
+      pairedMacAddress: link.macAddress,
+      wifiAddress: link.wifiAddress,
+      connectionState: nextTransport.getConnectionState(),
+      sessionState: 'idle',
+      telemetryLog: [],
+      latestMetrics: null,
+    });
+  };
+
   return {
     transport: initialTransport,
     connectionState: initialTransport.getConnectionState(),
@@ -64,33 +91,22 @@ export const useDeviceStore = create<DeviceState>((set, get) => {
     telemetryLog: [],
     latestMetrics: null,
     pairedMacAddress: null,
+    wifiAddress: null,
 
     hydrate: async () => {
-      const stored = await deviceStorage.getPairedMacAddress();
-      if (stored) {
-        await get().setPairedDevice(stored);
+      const [wifi, mac] = await Promise.all([
+        deviceStorage.getWifiAddress(),
+        deviceStorage.getPairedMacAddress(),
+      ]);
+      if (wifi) {
+        await get().setWifiDevice(wifi);
+      } else if (mac) {
+        await get().setPairedDevice(mac);
       }
     },
 
-    setPairedDevice: async (address) => {
-      const previous = get().transport;
-      await previous.disconnect().catch(() => {});
-      detachCurrentTransportListeners?.();
-
-      await deviceStorage.setPairedMacAddress(address);
-
-      const nextTransport = createDeviceTransport(address ?? undefined);
-      detachCurrentTransportListeners = attachTransportListeners(nextTransport, set);
-
-      set({
-        transport: nextTransport,
-        pairedMacAddress: address,
-        connectionState: nextTransport.getConnectionState(),
-        sessionState: 'idle',
-        telemetryLog: [],
-        latestMetrics: null,
-      });
-    },
+    setPairedDevice: (address) => switchLink({ macAddress: address, wifiAddress: null }),
+    setWifiDevice: (address) => switchLink({ macAddress: null, wifiAddress: address }),
 
     connect: () => get().transport.connect(),
     disconnect: () => get().transport.disconnect(),
