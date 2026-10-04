@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Platform, Pressable, View } from 'react-native';
 
@@ -23,10 +23,19 @@ export default function ConnectDeviceScreen() {
   const connectionState = useDeviceStore((state) => state.connectionState);
   const disconnect = useDeviceStore((state) => state.disconnect);
   const isSignedIn = useAuthStore((state) => state.status === 'authenticated');
+  const { from } = useLocalSearchParams<{ from?: string }>();
   // Bluetooth can't reach a real unit on iPhone, so start iPhones on Wi-Fi.
   const [method, setMethod] = useState<ConnectMethod>(
     Platform.OS === 'ios' ? 'shared' : 'bluetooth',
   );
+
+  const startDrill = () => {
+    if (from === 'drill' && router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(isSignedIn ? '/(tabs)/drill' : '/exercises/create');
+    }
+  };
 
   const isConnected =
     connectionState === 'online' || connectionState === 'ready' || connectionState === 'busy';
@@ -68,7 +77,7 @@ export default function ConnectDeviceScreen() {
               label="Start a Drill"
               variant="accent"
               size="lg"
-              onPress={() => router.replace(isSignedIn ? '/(tabs)/drill' : '/exercises/create')}
+              onPress={startDrill}
               fullWidth
             />
             <Button label="Disconnect" variant="ghost" onPress={disconnect} />
