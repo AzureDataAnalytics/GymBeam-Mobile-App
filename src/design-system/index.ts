@@ -5,6 +5,7 @@ export * from './components/EmptyState';
 export * from './components/ErrorState';
 export * from './components/LoadingState';
 export * from './components/Screen';
+export * from './components/ScreenHeader';
 export * from './components/Text';
 export * from './components/TextField';
 export * from './theme';

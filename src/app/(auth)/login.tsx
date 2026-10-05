@@ -51,7 +51,7 @@ export default function LoginScreen() {
       <View style={{ flex: 1, paddingTop: theme.spacing.xxl }}>
         <AuthLogo />
 
-        <View style={{ gap: theme.spacing.xl, marginTop: theme.spacing.xxxl }}>
+        <View style={{ gap: theme.spacing.lg, marginTop: theme.spacing.xxl }}>
           <Controller
             control={control}
             name="email"
@@ -105,7 +105,9 @@ export default function LoginScreen() {
           href="/(auth)/forgot-password"
           style={{ alignSelf: 'flex-end', marginTop: theme.spacing.md }}
         >
-          <Text color="link">Forgot Password?</Text>
+          <Text variant="caption" color="link" style={{ fontWeight: '500' }}>
+            Forgot Password?
+          </Text>
         </Link>
 
         {error ? (
@@ -125,47 +127,23 @@ export default function LoginScreen() {
           />
         </View>
 
-        <SocialSignInButtons />
-
         <View
           style={{
             flexDirection: 'row',
             justifyContent: 'center',
             gap: theme.spacing.sm,
-            marginTop: theme.spacing.xl,
-          }}
-        >
-          <Text>You don’t have an account?</Text>
-          <Link href="/(auth)/register" replace>
-            <Text color="link">Sign Up</Text>
-          </Link>
-        </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            gap: theme.spacing.lg,
             marginTop: theme.spacing.lg,
           }}
         >
-          <Link href="/exercises/create">
-            <Text color="link" variant="caption">
-              Preview: Create Drill
-            </Text>
-          </Link>
-          <Link href="/devices/connect">
-            <Text color="link" variant="caption">
-              Preview: Connect Device
-            </Text>
-          </Link>
-          <Link href="/runs/multi-point">
-            <Text color="link" variant="caption">
-              Preview: Multi Point Run
+          <Text variant="caption">You don’t have an account?</Text>
+          <Link href="/(auth)/register" replace>
+            <Text variant="caption" color="link" style={{ fontWeight: '600' }}>
+              Sign Up
             </Text>
           </Link>
         </View>
+
+        <SocialSignInButtons />
 
         <AuthTermsNotice />
       </View>

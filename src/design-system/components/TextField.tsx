@@ -33,7 +33,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
           borderColor: hasError ? theme.colors.danger : theme.colors.border,
           borderRadius: theme.radius.md,
           backgroundColor: theme.colors.surface,
-          minHeight: hideLabel ? 56 : 48,
+          minHeight: 50,
           paddingRight: trailing ? theme.spacing.md : 0,
         }}
       >
