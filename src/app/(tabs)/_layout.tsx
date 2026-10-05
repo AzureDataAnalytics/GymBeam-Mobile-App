@@ -57,7 +57,7 @@ export default function TabsLayout() {
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
             <TabIcon focused={focused}>
-              <Ionicons name="home" color={color} size={24} />
+              <Ionicons name="home-outline" color={color} size={24} />
             </TabIcon>
           ),
         }}
@@ -68,7 +68,7 @@ export default function TabsLayout() {
           title: 'Drill',
           tabBarIcon: ({ color, focused }) => (
             <TabIcon focused={focused}>
-              <MaterialCommunityIcons name="run-fast" color={color} size={24} />
+              <MaterialCommunityIcons name="target" color={color} size={24} />
             </TabIcon>
           ),
         }}
@@ -79,7 +79,7 @@ export default function TabsLayout() {
           title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
             <TabIcon focused={focused}>
-              <Ionicons name="person" color={color} size={24} />
+              <Ionicons name="person-outline" color={color} size={24} />
             </TabIcon>
           ),
         }}

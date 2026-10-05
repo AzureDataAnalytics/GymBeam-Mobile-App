@@ -117,6 +117,8 @@ export interface SemanticColors {
   link: string;
   /** Drill target markers and the path between them. */
   target: string;
+  targetStrong: string;
+  gridAxis: string;
   success: string;
   warning: string;
   danger: string;
@@ -143,6 +145,8 @@ export const colors: Record<ColorScheme, SemanticColors> = {
     accentSoft: palette.pink[100],
     link: palette.teal[700],
     target: palette.teal[500],
+    targetStrong: palette.teal[700],
+    gridAxis: palette.neutral[300],
     success: palette.green[500],
     warning: palette.amber[500],
     danger: palette.red[500],
@@ -166,6 +170,8 @@ export const colors: Record<ColorScheme, SemanticColors> = {
     accentSoft: palette.pink[900],
     link: palette.teal[300],
     target: palette.teal[500],
+    targetStrong: palette.teal[700],
+    gridAxis: palette.neutral[500],
     success: palette.green[500],
     warning: palette.amber[500],
     danger: palette.red[500],

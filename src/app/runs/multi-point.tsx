@@ -33,7 +33,9 @@ export default function MultiPointRunScreen() {
 
       <View style={{ padding: theme.spacing.lg, gap: theme.spacing.lg }}>
         <RunSelector count={SAMPLE_RUNS.length} selected={runIndex} onSelect={setRunIndex} />
-        <RunMap targets={run.targets} />
+        <View style={[card, { overflow: 'hidden' }]}>
+          <RunMap targets={run.targets} />
+        </View>
 
         <View
           style={[card, { flexDirection: 'row', alignItems: 'center', padding: theme.spacing.md }]}
@@ -84,14 +86,14 @@ export default function MultiPointRunScreen() {
         </View>
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.md }}>
-          <StatTile icon="run-fast" label="Runs" value={`${summary.runs}`} />
+          <StatTile icon="target" label="Runs" value={`${summary.runs}`} />
           <StatTile
-            icon="map-marker-distance"
+            icon="map-marker-path"
             label="Distance"
             value={`${summary.distanceKm} km`}
           />
           <StatTile icon="timer-sand" label="Active time" value={`${summary.activeTimeHours} h`} />
-          <StatTile icon="speedometer" label="Speed" value={`${summary.avgSpeedKmph} km/h`} />
+          <StatTile icon="gauge" label="Speed" value={`${summary.avgSpeedKmph} km/h`} />
           <StatTile icon="sync" label="Consistency" value={`${summary.consistencyPercent}%`} />
           <StatTile icon="chart-bar" label="Reflex score" value={`${summary.reflexScore}`} />
         </View>
@@ -143,7 +145,7 @@ function RunSelector({
           alignSelf: 'stretch',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: direction === 1 ? `${theme.colors.target}26` : theme.colors.background,
+          backgroundColor: direction === 1 ? `${theme.colors.target}26` : 'transparent',
           opacity: disabled ? 0.4 : 1,
         }}
       >
@@ -187,9 +189,7 @@ function RunSelector({
               }}
               onPress={() => select(index)}
               style={{
-                flexDirection: 'row',
                 alignItems: 'center',
-                gap: theme.spacing.xs,
                 minWidth: 48,
                 height: 48,
                 paddingHorizontal: theme.spacing.lg,
@@ -200,9 +200,6 @@ function RunSelector({
                 backgroundColor: isSelected ? `${theme.colors.target}1F` : 'transparent',
               }}
             >
-              {isSelected ? (
-                <MaterialCommunityIcons name="source-commit" size={18} color={theme.colors.link} />
-              ) : null}
               <Text
                 variant="bodyStrong"
                 style={{ color: isSelected ? theme.colors.link : theme.colors.textPrimary }}

@@ -1,29 +1,24 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import Svg, { Circle, Line, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, Line, Rect, Text as SvgText } from 'react-native-svg';
 
 import { useTheme } from '@/design-system';
-import {
-  METER_GRID_LABEL_GUTTER as LABEL_GUTTER,
-  MeterGridLines,
-} from '@/features/exercises/MeterGridLines';
+import { MeterGridLines } from '@/features/exercises/MeterGridLines';
 import type { TargetPoint } from '@/types/domain';
 
-const DEVICE_RANGE_METERS = 4;
-const GRID_CELLS = DEVICE_RANGE_METERS * 2;
-const EDGE_PADDING = 16;
-
+const GRID_COLUMNS = 8;
+const GRID_ROWS = 6;
 
 export function RunMap({ targets }: { targets: TargetPoint[] }) {
   const theme = useTheme();
   const [width, setWidth] = useState(0);
 
-  const cell = Math.max(0, (width - LABEL_GUTTER - EDGE_PADDING) / GRID_CELLS);
-  const gridSize = cell * GRID_CELLS;
-  const height = LABEL_GUTTER + gridSize + EDGE_PADDING;
-  const centerX = LABEL_GUTTER + gridSize / 2;
-  const centerY = LABEL_GUTTER + gridSize / 2;
-  const markerRadius = Math.max(12, cell * 0.42);
+  const cell = width / GRID_COLUMNS;
+  const height = cell * GRID_ROWS;
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const markerRadius = Math.max(12, cell * 0.34);
+  const deviceSize = cell * 0.4;
 
   const toScreen = (point: TargetPoint) => ({
     cx: centerX + point.x * cell,
@@ -34,7 +29,7 @@ export function RunMap({ targets }: { targets: TargetPoint[] }) {
   return (
     <View
       onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
-      style={{ height }}
+      style={{ aspectRatio: GRID_COLUMNS / GRID_ROWS }}
       accessible
       accessibilityRole="image"
       accessibilityLabel={`Run map with ${targets.length} targets around the device`}
@@ -42,21 +37,13 @@ export function RunMap({ targets }: { targets: TargetPoint[] }) {
       {width > 0 ? (
         <Svg width={width} height={height}>
           <MeterGridLines
-            columns={GRID_CELLS}
-            rows={GRID_CELLS}
+            columns={GRID_COLUMNS}
+            rows={GRID_ROWS}
             cell={cell}
-            left={LABEL_GUTTER}
-            top={LABEL_GUTTER}
-          />
-
-          <Circle
-            cx={centerX}
-            cy={centerY}
-            r={DEVICE_RANGE_METERS * cell}
-            fill={theme.colors.target}
-            fillOpacity={0.1}
-            stroke={theme.colors.target}
-            strokeWidth={3}
+            left={0}
+            top={0}
+            originRow={GRID_ROWS / 2}
+            showLabels={false}
           />
 
           {path.slice(1).map((to, i) => (
@@ -66,33 +53,20 @@ export function RunMap({ targets }: { targets: TargetPoint[] }) {
               y1={path[i]!.cy}
               x2={to.cx}
               y2={to.cy}
-              stroke={theme.colors.accent}
-              strokeOpacity={0.7}
-              strokeWidth={2}
-              strokeDasharray="6 5"
+              stroke={theme.colors.target}
+              strokeWidth={3}
+              strokeLinecap="round"
             />
           ))}
 
-          <Circle
-            cx={centerX}
-            cy={centerY}
-            r={markerRadius + 5}
-            fill={theme.colors.accent}
-            fillOpacity={0.15}
-            stroke={theme.colors.accent}
-            strokeOpacity={0.4}
+          <Rect
+            x={centerX - deviceSize / 2}
+            y={centerY - deviceSize / 2}
+            width={deviceSize}
+            height={deviceSize}
+            rx={4}
+            fill={theme.colors.textPrimary}
           />
-          <Circle cx={centerX} cy={centerY} r={markerRadius} fill={theme.colors.accent} />
-          <SvgText
-            x={centerX}
-            y={centerY + 5}
-            fontSize={15}
-            fontWeight="600"
-            fill={theme.colors.onAccent}
-            textAnchor="middle"
-          >
-            0
-          </SvgText>
 
           {path.slice(1).map(({ cx, cy }, index) => (
             <Circle
@@ -100,9 +74,7 @@ export function RunMap({ targets }: { targets: TargetPoint[] }) {
               cx={cx}
               cy={cy}
               r={markerRadius}
-              fill={theme.colors.target}
-              stroke={theme.colors.surface}
-              strokeWidth={2}
+              fill={theme.colors.targetStrong}
             />
           ))}
           {path.slice(1).map(({ cx, cy }, index) => (

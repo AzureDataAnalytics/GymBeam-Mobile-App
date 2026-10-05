@@ -43,7 +43,7 @@ export function Button({
   > = {
     primary: { background: theme.colors.tint, text: theme.colors.textInverse },
     accent: { background: theme.colors.accent, text: theme.colors.onAccent },
-    secondary: { background: theme.colors.surfaceRaised, text: theme.colors.textPrimary },
+    secondary: { background: theme.colors.skeleton, text: theme.colors.textPrimary },
     outline: {
       background: 'transparent',
       text: theme.colors.textPrimary,

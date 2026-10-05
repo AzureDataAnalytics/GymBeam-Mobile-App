@@ -48,15 +48,25 @@ export function ConnectPulse({
       />
       <View
         style={{
-          width: 72,
-          height: 72,
+          position: 'absolute',
+          width: 112,
+          height: 112,
+          borderRadius: theme.radius.full,
+          backgroundColor: theme.colors.target,
+          opacity: 0.2,
+        }}
+      />
+      <View
+        style={{
+          width: 64,
+          height: 64,
           borderRadius: theme.radius.full,
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: theme.colors.target,
+          backgroundColor: theme.colors.targetStrong,
         }}
       >
-        <Ionicons name={icon} size={36} color={theme.colors.onAccent} />
+        <Ionicons name={icon} size={30} color={theme.colors.onAccent} />
       </View>
     </View>
   );
