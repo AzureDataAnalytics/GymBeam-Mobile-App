@@ -42,7 +42,7 @@ turned out to be decommissioned).
     hashed passwords, no salt — a device gate, not real account security;
     see the caveat in `docs/architecture.md`). No network call anywhere in
     auth.
-  - Expo Router groups: `(auth)` (welcome/login/register/forgot-password,
+  - Expo Router groups: `(auth)` (login/register/forgot-password,
     working login+register forms with zod validation) and `(tabs)`
     (Home/Exercises/Sessions/Devices/Profile), both auth-gated via redirects
     driven by `useAuthStore`.
