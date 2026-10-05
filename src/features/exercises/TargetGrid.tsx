@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { type GestureResponderEvent, Pressable, View } from 'react-native';
-import Svg, { Circle, Line, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, Line, Rect, Text as SvgText } from 'react-native-svg';
 
 import { useTheme } from '@/design-system';
 import type { TargetPoint } from '@/types/domain';
@@ -34,7 +34,8 @@ export function TargetGrid({
   const gridWidth = cell * GRID_COLUMNS;
   const gridHeight = cell * GRID_ROWS;
   const height = gridTop + gridHeight + EDGE_PADDING;
-  const targetRadius = cell * 0.32;
+  const targetRadius = cell * 0.3;
+  const deviceSize = cell * 0.34;
 
   const toScreen = (point: TargetPoint) => ({
     cx: gridLeft + gridWidth / 2 + point.x * cell,
@@ -70,6 +71,7 @@ export function TargetGrid({
   };
 
   const device = toScreen({ x: 0, y: 0 });
+  const selectedTarget = selectedIndex === null ? undefined : targets[selectedIndex];
 
   return (
     <View onLayout={(event) => setWidth(event.nativeEvent.layout.width)} style={{ height }}>
@@ -84,8 +86,8 @@ export function TargetGrid({
               top={gridTop}
             />
 
-            {targets.slice(1).map((target, i) => {
-              const from = toScreen(targets[i]!);
+            {targets.map((target, i) => {
+              const from = i === 0 ? device : toScreen(targets[i - 1]!);
               const to = toScreen(target);
               return (
                 <Line
@@ -95,26 +97,41 @@ export function TargetGrid({
                   x2={to.cx}
                   y2={to.cy}
                   stroke={theme.colors.target}
-                  strokeWidth={2}
-                  strokeDasharray="6 5"
+                  strokeWidth={3}
+                  strokeLinecap="round"
                 />
               );
             })}
 
-            <Circle cx={device.cx} cy={device.cy} r={targetRadius} fill={theme.colors.accent} />
+            <Rect
+              x={device.cx - deviceSize / 2}
+              y={device.cy - deviceSize / 2}
+              width={deviceSize}
+              height={deviceSize}
+              rx={4}
+              fill={theme.colors.textPrimary}
+            />
+
+            {selectedTarget ? (
+              <Circle
+                cx={toScreen(selectedTarget).cx}
+                cy={toScreen(selectedTarget).cy}
+                r={targetRadius + 5}
+                fill={theme.colors.surface}
+                stroke={theme.colors.accent}
+                strokeWidth={3}
+              />
+            ) : null}
 
             {targets.map((target, index) => {
               const { cx, cy } = toScreen(target);
-              const selected = index === selectedIndex;
               return (
                 <Circle
                   key={`t${index}`}
                   cx={cx}
                   cy={cy}
                   r={targetRadius}
-                  fill={theme.colors.target}
-                  stroke={selected ? theme.colors.accent : theme.colors.surface}
-                  strokeWidth={selected ? 3 : 0}
+                  fill={theme.colors.targetStrong}
                 />
               );
             })}

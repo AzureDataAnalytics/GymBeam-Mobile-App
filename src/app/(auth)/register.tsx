@@ -52,7 +52,7 @@ export default function RegisterScreen() {
       <View style={{ flex: 1, paddingTop: theme.spacing.xxl }}>
         <AuthLogo />
 
-        <View style={{ gap: theme.spacing.xl, marginTop: theme.spacing.xxxl }}>
+        <View style={{ gap: theme.spacing.lg, marginTop: theme.spacing.xxl }}>
           <Controller
             control={control}
             name="fullName"
@@ -138,22 +138,24 @@ export default function RegisterScreen() {
           />
         </View>
 
-        <SocialSignInButtons />
-
         <View
           style={{
             flexDirection: 'row',
             justifyContent: 'center',
             gap: theme.spacing.sm,
-            marginTop: theme.spacing.xl,
+            marginTop: theme.spacing.lg,
           }}
         >
-          <Text>Already have an account?</Text>
+          <Text variant="caption">Already have an account?</Text>
           {/* `replace` so toggling between login and register doesn't keep growing the stack. */}
           <Link href="/(auth)/login" replace>
-            <Text color="link">Sign In</Text>
+            <Text variant="caption" color="link" style={{ fontWeight: '600' }}>
+              Sign In
+            </Text>
           </Link>
         </View>
+
+        <SocialSignInButtons />
 
         <AuthTermsNotice />
       </View>

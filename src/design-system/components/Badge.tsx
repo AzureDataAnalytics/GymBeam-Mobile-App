@@ -28,9 +28,9 @@ export function Badge({ label, tone = 'neutral' }: BadgeProps) {
       style={{
         alignSelf: 'flex-start',
         borderRadius: theme.radius.full,
-        paddingVertical: theme.spacing.xxs,
-        paddingHorizontal: theme.spacing.sm,
-        backgroundColor: `${color}1A`,
+        paddingVertical: theme.spacing.xs,
+        paddingHorizontal: theme.spacing.md,
+        backgroundColor: tone === 'neutral' ? theme.colors.skeleton : `${color}1A`,
       }}
     >
       <Text variant="label" style={{ color }}>

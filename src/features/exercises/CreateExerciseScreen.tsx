@@ -1,10 +1,11 @@
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, View } from 'react-native';
 import { type Edge } from 'react-native-safe-area-context';
 
-import { Button, Screen, Text, useTheme } from '@/design-system';
+import { Badge, Button, Card, Screen, ScreenHeader, Text, useTheme } from '@/design-system';
+import { DEVICE_STATUS_LABEL, DEVICE_STATUS_TONE } from '@/features/devices/deviceStatus';
 import { useDeviceStore } from '@/state/deviceStore';
 import type { TargetPoint } from '@/types/domain';
 
@@ -64,59 +65,47 @@ export function CreateExerciseScreen({
 
   return (
     <Screen scroll padded={false} edges={edges}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: theme.spacing.lg,
-          paddingHorizontal: theme.spacing.lg,
-          paddingVertical: theme.spacing.lg,
-          backgroundColor: theme.colors.surface,
-        }}
-      >
-        {showBack ? (
+      <ScreenHeader
+        title="Create Exercise"
+        onBack={
+          showBack ? () => (router.canGoBack() ? router.back() : router.replace('/')) : undefined
+        }
+        trailing={
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Go back"
+            accessibilityLabel={`Device ${DEVICE_STATUS_LABEL[connectionState]}. Open Connect GymBeam`}
             hitSlop={12}
-            onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+            onPress={() => router.push({ pathname: '/devices/connect', params: { from: 'drill' } })}
           >
-            <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
+            <Badge
+              label={DEVICE_STATUS_LABEL[connectionState]}
+              tone={DEVICE_STATUS_TONE[connectionState]}
+            />
           </Pressable>
-        ) : null}
-        <Text variant="subtitle" accessibilityRole="header">
-          Create Exercise
-        </Text>
-      </View>
+        }
+      />
 
-      <View style={{ backgroundColor: theme.colors.surface, paddingVertical: theme.spacing.md }}>
-        <TargetGrid
-          targets={targets}
-          selectedIndex={selectedIndex}
-          onAddTarget={addTarget}
-          onSelectTarget={setSelectedIndex}
-          onRemoveTarget={removeTarget}
-        />
+      <View style={{ paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.lg }}>
+        <Card padded={false} style={{ overflow: 'hidden' }}>
+          <TargetGrid
+            targets={targets}
+            selectedIndex={selectedIndex}
+            onAddTarget={addTarget}
+            onSelectTarget={setSelectedIndex}
+            onRemoveTarget={removeTarget}
+          />
+        </Card>
         <Text
           variant="caption"
           color="secondary"
-          style={{ textAlign: 'center', marginTop: theme.spacing.xs }}
+          style={{ textAlign: 'center', marginTop: theme.spacing.sm }}
         >
           Tap the grid to add a target · Long-press a target to remove it
         </Text>
       </View>
 
-      <View style={{ flex: 1, padding: theme.spacing.lg, gap: theme.spacing.xl }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: theme.spacing.lg,
-            borderRadius: theme.radius.lg,
-            backgroundColor: theme.colors.surface,
-            ...theme.shadow.sm,
-          }}
-        >
+      <View style={{ flex: 1, padding: theme.spacing.lg, gap: theme.spacing.lg }}>
+        <Card style={{ flexDirection: 'row', alignItems: 'center', minHeight: 76 }}>
           {selected && selectedIndex !== null ? (
             <>
               <View
@@ -124,7 +113,7 @@ export function CreateExerciseScreen({
                   width: 40,
                   height: 40,
                   borderRadius: theme.radius.full,
-                  backgroundColor: theme.colors.target,
+                  backgroundColor: theme.colors.accent,
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginRight: theme.spacing.lg,
@@ -159,9 +148,9 @@ export function CreateExerciseScreen({
                 : 'Tap a target to see its angle and distance'}
             </Text>
           )}
-        </View>
+        </Card>
 
-        <View style={{ flexDirection: 'row', gap: theme.spacing.xl }}>
+        <View style={{ flexDirection: 'row', gap: theme.spacing.md, marginTop: 'auto' }}>
           <View style={{ flex: 1 }}>
             <Button
               label="Clear"
@@ -172,7 +161,7 @@ export function CreateExerciseScreen({
               fullWidth
             />
           </View>
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 2 }}>
             <Button
               label="Start a Drill"
               variant="accent"
@@ -202,8 +191,8 @@ function Metric({
   return (
     <View style={{ flex: 1, alignItems: 'center', gap: theme.spacing.xxs }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs }}>
-        <MaterialCommunityIcons name={icon} size={22} color={theme.colors.accent} />
-        <Text variant="subtitle" style={{ color: theme.colors.accent, fontWeight: '400' }}>
+        <MaterialCommunityIcons name={icon} size={20} color={theme.colors.accent} />
+        <Text variant="caption" style={{ color: theme.colors.accent }}>
           {label}
         </Text>
       </View>

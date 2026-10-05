@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Linking, Platform, View } from 'react-native';
 
-import { Button, Card, Text, TextField, useTheme } from '@/design-system';
+import { Button, Text, TextField, useTheme } from '@/design-system';
 import { env } from '@/constants/env';
 import {
   DEFAULT_HOTSPOT_HOST,
@@ -87,7 +87,7 @@ export function WifiConnectPanel({ mode }: { mode: WifiMode }) {
   };
 
   return (
-    <View style={{ gap: theme.spacing.xl }}>
+    <View style={{ gap: theme.spacing.lg }}>
       <View style={{ alignItems: 'center', gap: theme.spacing.md }}>
         <ConnectPulse icon={copy.icon} active />
         <Text variant="title" style={{ textAlign: 'center' }}>
@@ -95,7 +95,7 @@ export function WifiConnectPanel({ mode }: { mode: WifiMode }) {
         </Text>
       </View>
 
-      <Card style={{ gap: theme.spacing.md }}>
+      <View style={{ gap: theme.spacing.md }}>
         {copy.steps.map((step, index) => (
           <View key={step} style={{ flexDirection: 'row', gap: theme.spacing.md }}>
             <View
@@ -105,7 +105,7 @@ export function WifiConnectPanel({ mode }: { mode: WifiMode }) {
                 borderRadius: theme.radius.full,
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: theme.colors.target,
+                backgroundColor: theme.colors.accent,
               }}
             >
               <Text variant="label" style={{ color: theme.colors.onAccent }}>
@@ -124,7 +124,7 @@ export function WifiConnectPanel({ mode }: { mode: WifiMode }) {
             fullWidth
           />
         ) : null}
-      </Card>
+      </View>
 
       <View style={{ flexDirection: 'row', gap: theme.spacing.sm }}>
         <Ionicons name="information-circle-outline" size={20} color={theme.colors.warning} />

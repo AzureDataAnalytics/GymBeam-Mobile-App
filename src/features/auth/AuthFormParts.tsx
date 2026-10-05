@@ -39,7 +39,7 @@ export function PasswordVisibilityToggle({
       onPress={onToggle}
     >
       <Ionicons
-        name={visible ? 'eye-outline' : 'eye-off-outline'}
+        name={visible ? 'eye-off-outline' : 'eye-outline'}
         size={24}
         color={theme.colors.textSecondary}
       />
@@ -56,26 +56,40 @@ export function SocialSignInButtons() {
 
   return (
     <View>
-      <Text color="secondary" style={{ textAlign: 'center', marginVertical: theme.spacing.md }}>
-        Or Continue with
-      </Text>
-      <View style={{ gap: theme.spacing.xl }}>
-        <Button
-          label="Google"
-          variant="outline"
-          size="lg"
-          icon={<GoogleIcon />}
-          onPress={() => showSocialUnavailable('Google')}
-          fullWidth
-        />
-        <Button
-          label="Facebook"
-          variant="outline"
-          size="lg"
-          icon={<FacebookIcon />}
-          onPress={() => showSocialUnavailable('Facebook')}
-          fullWidth
-        />
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: theme.spacing.md,
+          marginTop: theme.spacing.xl,
+          marginBottom: theme.spacing.lg,
+        }}
+      >
+        <View style={{ flex: 1, height: 1, backgroundColor: theme.colors.border }} />
+        <Text variant="caption" color="secondary">
+          Or continue with
+        </Text>
+        <View style={{ flex: 1, height: 1, backgroundColor: theme.colors.border }} />
+      </View>
+      <View style={{ flexDirection: 'row', gap: theme.spacing.md }}>
+        <View style={{ flex: 1 }}>
+          <Button
+            label="Google"
+            variant="outline"
+            icon={<GoogleIcon />}
+            onPress={() => showSocialUnavailable('Google')}
+            fullWidth
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Button
+            label="Facebook"
+            variant="outline"
+            icon={<FacebookIcon />}
+            onPress={() => showSocialUnavailable('Facebook')}
+            fullWidth
+          />
+        </View>
       </View>
     </View>
   );
@@ -86,16 +100,13 @@ export function AuthTermsNotice() {
   const theme = useTheme();
 
   return (
-    <View style={{ marginTop: 'auto', paddingTop: theme.spacing.xxxl, gap: theme.spacing.md }}>
-      <Text variant="caption" color="secondary" style={{ opacity: 0.6 }}>
-        By continuing with your account, Google or Facebook, you agree to GymBeam’s Terms of
-        Service.
-      </Text>
-      <Text variant="caption" color="secondary" style={{ opacity: 0.6 }}>
-        Our{' '}
-        <Text variant="caption" color="secondary" style={{ fontWeight: '600' }}>
-          Terms and Privacy Policy.
+    <View style={{ marginTop: 'auto', paddingTop: theme.spacing.xl }}>
+      <Text variant="label" color="secondary" style={{ fontWeight: '400', textAlign: 'center' }}>
+        By continuing with your account, Google or Facebook, you agree to GymBeam’s{' '}
+        <Text variant="label" color="secondary" style={{ textDecorationLine: 'underline' }}>
+          Terms and Privacy Policy
         </Text>
+        .
       </Text>
     </View>
   );

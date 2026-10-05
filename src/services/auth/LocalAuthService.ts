@@ -1,6 +1,7 @@
 import * as Crypto from 'expo-crypto';
 
 import { ApiError } from '@/api/httpError';
+import { env } from '@/constants/env';
 import { SECURE_STORE_KEYS, secureStore } from '@/storage/secureStore';
 import type { User } from '@/types/domain';
 
@@ -9,7 +10,6 @@ import type { AuthService, AuthSession, LoginCredentials, RegisterInput } from '
 interface LocalUserRecord {
   id: string;
   fullName?: string;
-  /** Only on legacy accounts, from before login switched to email. */
   username?: string;
   email: string;
   passwordHash: string;
@@ -17,8 +17,32 @@ interface LocalUserRecord {
 
 type LocalUserTable = Record<string, LocalUserRecord>;
 
+const SAMPLE_ACCOUNT = {
+  id: 'sample-user',
+  fullName: 'Test User',
+  email: 'test@mail.com',
+  password: 'Test@123',
+};
+
 export class LocalAuthService implements AuthService {
   async login({ email, password }: LoginCredentials): Promise<AuthSession> {
+    if (
+      !env.isProduction &&
+      normalizeEmail(email) === SAMPLE_ACCOUNT.email &&
+      password === SAMPLE_ACCOUNT.password
+    ) {
+      const session: AuthSession = {
+        user: {
+          id: SAMPLE_ACCOUNT.id,
+          name: SAMPLE_ACCOUNT.fullName,
+          email: SAMPLE_ACCOUNT.email,
+          roles: ['member'],
+        },
+      };
+      await secureStore.setJSON(SECURE_STORE_KEYS.authSession, session);
+      return session;
+    }
+
     const record = findByEmail(await this.getUserTable(), email);
     if (!record) {
       throw new ApiError('auth', 'Invalid email or password');

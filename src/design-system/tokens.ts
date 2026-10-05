@@ -1,8 +1,3 @@
-/**
- * Design tokens: the single source of truth for spacing, color, type, radius
- * and shadow across the app. Screens and components consume these — they
- * never hardcode a hex value or a raw pixel number.
- */
 
 export const spacing = {
   xxs: 2,
@@ -17,7 +12,7 @@ export const spacing = {
 
 export const radius = {
   sm: 6,
-  md: 10,
+  md: 12,
   lg: 16,
   xl: 24,
   full: 9999,
@@ -69,8 +64,11 @@ const palette = {
     600: '#B5720C',
   },
   pink: {
+    100: '#FFE3EE',
     500: '#FF3380',
     600: '#E0226B',
+    700: '#C2185B',
+    900: '#4A1029',
   },
   teal: {
     300: '#4FC3B0',
@@ -114,10 +112,13 @@ export interface SemanticColors {
   accentPressed: string;
   /** Text/icons drawn on top of `accent`. */
   onAccent: string;
+  accentSoft: string;
   /** Inline text links. */
   link: string;
   /** Drill target markers and the path between them. */
   target: string;
+  targetStrong: string;
+  gridAxis: string;
   success: string;
   warning: string;
   danger: string;
@@ -138,11 +139,14 @@ export const colors: Record<ColorScheme, SemanticColors> = {
     textInverse: palette.neutral[0],
     tint: palette.blue[500],
     tintPressed: palette.blue[600],
-    accent: palette.pink[500],
-    accentPressed: palette.pink[600],
+    accent: palette.pink[600],
+    accentPressed: palette.pink[700],
     onAccent: palette.neutral[0],
+    accentSoft: palette.pink[100],
     link: palette.teal[700],
     target: palette.teal[500],
+    targetStrong: palette.teal[700],
+    gridAxis: palette.neutral[300],
     success: palette.green[500],
     warning: palette.amber[500],
     danger: palette.red[500],
@@ -160,11 +164,14 @@ export const colors: Record<ColorScheme, SemanticColors> = {
     textInverse: palette.neutral[950],
     tint: palette.blue[500],
     tintPressed: palette.blue[600],
-    accent: palette.pink[500],
-    accentPressed: palette.pink[600],
+    accent: palette.pink[600],
+    accentPressed: palette.pink[700],
     onAccent: palette.neutral[0],
+    accentSoft: palette.pink[900],
     link: palette.teal[300],
     target: palette.teal[500],
+    targetStrong: palette.teal[700],
+    gridAxis: palette.neutral[500],
     success: palette.green[500],
     warning: palette.amber[500],
     danger: palette.red[500],
