@@ -114,11 +114,7 @@ export default function DevicesScreen() {
           />
         ) : null}
 
-        <Text variant="caption" color="secondary">
-          {isMock
-            ? 'Set EXPO_PUBLIC_ENABLE_MOCK_DEVICE=false in a development build on Android to pair a real GymBeam unit — see docs/device-integration.md.'
-            : 'Bluetooth Classic is Android-only — see docs/device-integration.md for why iOS uses a simulated device.'}
-        </Text>
+      
       </View>
     </Screen>
   );
