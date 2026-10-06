@@ -19,11 +19,6 @@ export type PasswordResetMailer = {
 
 type EmailJsConfig = NonNullable<typeof env.emailJs>;
 
-/**
- * Sends the code through EmailJS, a hosted service that lets an app send
- * email without a server of its own. This is the app's only internet call.
- * The EmailJS template must use the variables sent in `template_params`.
- */
 export class EmailJsMailer implements PasswordResetMailer {
   constructor(private readonly config: EmailJsConfig) {}
 
@@ -50,7 +45,8 @@ export class EmailJsMailer implements PasswordResetMailer {
         }),
       });
       if (!response.ok) {
-        logger.warn('EmailJS rejected the reset email', { status: response.status });
+        const reason = await response.text().catch(() => '');
+        logger.warn('EmailJS rejected the reset email', { status: response.status, reason });
         throw new Error(`EmailJS responded with ${response.status}`);
       }
     } finally {
@@ -59,7 +55,6 @@ export class EmailJsMailer implements PasswordResetMailer {
   }
 }
 
-/** Development stand-in when EmailJS isn't configured: the code goes to the Metro log. */
 export class DevLogMailer implements PasswordResetMailer {
   async sendCode({ email, code }: PasswordResetEmail): Promise<void> {
     logger.debug('EmailJS is not configured — password reset code', { email, code });
