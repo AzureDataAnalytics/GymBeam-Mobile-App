@@ -13,12 +13,12 @@ export default function MultiPointRunScreen() {
       badgeLabel="Sample data"
       runs={SAMPLE_RUNS}
       stats={[
-        { icon: 'run-fast', label: 'Runs', value: `${summary.runs}` },
-        { icon: 'map-marker-distance', label: 'Distance', value: `${summary.distanceKm} km` },
-        { icon: 'timer-sand', label: 'Active time', value: `${summary.activeTimeHours} Hours` },
-        { icon: 'speedometer', label: 'Speed', value: `${summary.avgSpeedKmph} Kmph` },
+        { icon: 'target', label: 'Runs', value: `${summary.runs}` },
+        { icon: 'map-marker-path', label: 'Distance', value: `${summary.distanceKm} km` },
+        { icon: 'timer-sand', label: 'Active time', value: `${summary.activeTimeHours} h` },
+        { icon: 'gauge', label: 'Speed', value: `${summary.avgSpeedKmph} km/h` },
         { icon: 'sync', label: 'Consistency', value: `${summary.consistencyPercent}%` },
-        { icon: 'chart-bar', label: 'Reflex Score', value: `${summary.reflexScore}` },
+        { icon: 'chart-bar', label: 'Reflex score', value: `${summary.reflexScore}` },
       ]}
       footer={
         <Button

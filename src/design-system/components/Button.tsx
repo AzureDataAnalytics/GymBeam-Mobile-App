@@ -5,7 +5,8 @@ import { minTouchTarget } from '../tokens';
 import { useTheme } from '../theme';
 import { Text } from './Text';
 
-export type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'outline' | 'ghost' | 'danger';
+export type ButtonVariant =
+  'primary' | 'accent' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'dangerOutline';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export type ButtonProps = Omit<PressableProps, 'style'> & {
@@ -42,7 +43,7 @@ export function Button({
   > = {
     primary: { background: theme.colors.tint, text: theme.colors.textInverse },
     accent: { background: theme.colors.accent, text: theme.colors.onAccent },
-    secondary: { background: theme.colors.surfaceRaised, text: theme.colors.textPrimary },
+    secondary: { background: theme.colors.skeleton, text: theme.colors.textPrimary },
     outline: {
       background: 'transparent',
       text: theme.colors.textPrimary,
@@ -50,6 +51,11 @@ export function Button({
     },
     ghost: { background: 'transparent', text: theme.colors.tint },
     danger: { background: theme.colors.danger, text: theme.colors.textInverse },
+    dangerOutline: {
+      background: 'transparent',
+      text: theme.colors.danger,
+      border: theme.colors.danger,
+    },
   };
 
   const style = variantStyles[variant];
@@ -65,10 +71,10 @@ export function Button({
         {
           backgroundColor: style.background,
           borderColor: style.border ?? 'transparent',
-          borderWidth: style.border ? StyleSheet.hairlineWidth : 0,
+          borderWidth: style.border ? 1 : 0,
           opacity: isDisabled ? 0.5 : pressed ? 0.85 : 1,
           width: fullWidth ? '100%' : undefined,
-          minHeight: minTouchTarget,
+          minHeight: size === 'sm' ? minTouchTarget : 50,
           borderRadius: theme.radius.md,
         },
       ]}

@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { type ReactNode, useRef, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 
-import { Badge, Screen, Text, useTheme } from '@/design-system';
+import { Badge, Screen, ScreenHeader, Text, useTheme } from '@/design-system';
 
 import { RunMap } from './RunMap';
 import type { RunSample } from './sampleRunSession';
@@ -35,46 +35,24 @@ export function RunSessionView({ title, badgeLabel, runs, stats, footer }: RunSe
   const card = {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius.lg,
-    ...theme.shadow.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   };
 
   return (
     <Screen scroll padded={false}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: theme.spacing.lg,
-          padding: theme.spacing.lg,
-          backgroundColor: theme.colors.surface,
-          borderBottomWidth: 1,
-          borderBottomColor: theme.colors.border,
-        }}
-      >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-          hitSlop={12}
-          onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
-        >
-          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
-        </Pressable>
-        <Text
-          variant="subtitle"
-          accessibilityRole="header"
-          style={{ flex: 1, color: theme.colors.accent }}
-        >
-          {title}
-        </Text>
-        {badgeLabel ? <Badge label={badgeLabel} /> : null}
-      </View>
+      <ScreenHeader
+        title={title}
+        onBack={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+        trailing={badgeLabel ? <Badge label={badgeLabel} /> : undefined}
+      />
 
       <View style={{ padding: theme.spacing.lg, gap: theme.spacing.lg }}>
         <RunSelector count={runs.length} selected={runIndex} onSelect={setRunIndex} />
-        <RunMap targets={run.targets} />
-      </View>
+        <View style={[card, { overflow: 'hidden' }]}>
+          <RunMap targets={run.targets} />
+        </View>
 
-      <View style={{ padding: theme.spacing.lg, gap: theme.spacing.lg }}>
         <View
           style={[card, { flexDirection: 'row', alignItems: 'center', padding: theme.spacing.md }]}
         >
@@ -92,7 +70,7 @@ export function RunSessionView({ title, badgeLabel, runs, stats, footer }: RunSe
               color={theme.colors.textSecondary}
             />
             <Text variant="caption" color="secondary" style={{ textAlign: 'center' }}>
-              {'Speed\nKmph'}
+              {'Speed\nkm/h'}
             </Text>
           </View>
           <SpeedValue
@@ -170,7 +148,7 @@ function RunSelector({
           alignSelf: 'stretch',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: direction === 1 ? `${theme.colors.target}26` : theme.colors.background,
+          backgroundColor: direction === 1 ? `${theme.colors.target}26` : 'transparent',
           opacity: disabled ? 0.4 : 1,
         }}
       >
@@ -190,7 +168,8 @@ function RunSelector({
         backgroundColor: theme.colors.surface,
         borderRadius: theme.radius.lg,
         overflow: 'hidden',
-        ...theme.shadow.sm,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
       }}
     >
       {arrow(-1)}
@@ -213,9 +192,7 @@ function RunSelector({
               }}
               onPress={() => select(index)}
               style={{
-                flexDirection: 'row',
                 alignItems: 'center',
-                gap: theme.spacing.xs,
                 minWidth: 48,
                 height: 48,
                 paddingHorizontal: theme.spacing.lg,
@@ -223,11 +200,9 @@ function RunSelector({
                 borderRadius: theme.radius.full,
                 borderWidth: 1,
                 borderColor: isSelected ? theme.colors.target : theme.colors.border,
+                backgroundColor: isSelected ? `${theme.colors.target}1F` : 'transparent',
               }}
             >
-              {isSelected ? (
-                <MaterialCommunityIcons name="source-commit" size={18} color={theme.colors.link} />
-              ) : null}
               <Text
                 variant="bodyStrong"
                 style={{ color: isSelected ? theme.colors.link : theme.colors.textPrimary }}

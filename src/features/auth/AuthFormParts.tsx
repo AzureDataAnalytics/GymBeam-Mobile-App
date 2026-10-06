@@ -37,7 +37,7 @@ export function PasswordVisibilityToggle({
       onPress={onToggle}
     >
       <Ionicons
-        name={visible ? 'eye-outline' : 'eye-off-outline'}
+        name={visible ? 'eye-off-outline' : 'eye-outline'}
         size={24}
         color={theme.colors.textSecondary}
       />
@@ -49,15 +49,13 @@ export function AuthTermsNotice() {
   const theme = useTheme();
 
   return (
-    <View style={{ marginTop: 'auto', paddingTop: theme.spacing.xxxl, gap: theme.spacing.md }}>
-      <Text variant="caption" color="secondary" style={{ opacity: 0.6 }}>
-        By continuing with your account, you agree to GymBeam’s Terms of Service.
-      </Text>
-      <Text variant="caption" color="secondary" style={{ opacity: 0.6 }}>
-        Our{' '}
-        <Text variant="caption" color="secondary" style={{ fontWeight: '600' }}>
-          Terms and Privacy Policy.
+    <View style={{ marginTop: 'auto', paddingTop: theme.spacing.xl }}>
+      <Text variant="label" color="secondary" style={{ fontWeight: '400', textAlign: 'center' }}>
+        By continuing with your account, you agree to GymBeam’s{' '}
+        <Text variant="label" color="secondary" style={{ textDecorationLine: 'underline' }}>
+          Terms and Privacy Policy
         </Text>
+        .
       </Text>
     </View>
   );

@@ -39,6 +39,6 @@ export function Card({
 
 const styles = StyleSheet.create({
   base: {
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: 1,
   },
 });

@@ -3,7 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Platform, Pressable, View } from 'react-native';
 
-import { Badge, Button, Card, Screen, Text, useTheme } from '@/design-system';
+import { Badge, Button, Card, Screen, ScreenHeader, Text, useTheme } from '@/design-system';
 import { env } from '@/constants/env';
 import { BluetoothConnectPanel } from '@/features/devices/BluetoothConnectPanel';
 import { WifiConnectPanel } from '@/features/devices/WifiConnectPanel';
@@ -42,32 +42,15 @@ export default function ConnectDeviceScreen() {
 
   return (
     <Screen scroll padded={false}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: theme.spacing.lg,
-          padding: theme.spacing.lg,
-          backgroundColor: theme.colors.surface,
-        }}
-      >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-          hitSlop={12}
-          onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
-        >
-          <Ionicons name="arrow-back" size={24} color={theme.colors.textPrimary} />
-        </Pressable>
-        <Text variant="subtitle" accessibilityRole="header" style={{ flex: 1 }}>
-          Connect GymBeam
-        </Text>
-        {env.enableMockDevice ? <Badge label="Simulated" tone="warning" /> : null}
-      </View>
+      <ScreenHeader
+        title="Connect GymBeam"
+        onBack={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+        trailing={env.enableMockDevice ? <Badge label="Simulated" tone="warning" /> : null}
+      />
 
-      <View style={{ padding: theme.spacing.lg, gap: theme.spacing.xl }}>
+      <View style={{ padding: theme.spacing.lg, gap: theme.spacing.lg }}>
         {isConnected ? (
-          <Card elevated style={{ alignItems: 'center', gap: theme.spacing.md }}>
+          <Card style={{ alignItems: 'center', gap: theme.spacing.md }}>
             <Ionicons name="checkmark-circle" size={56} color={theme.colors.success} />
             <Text variant="title">Connected</Text>
             <Text color="secondary" style={{ textAlign: 'center' }}>
@@ -90,7 +73,7 @@ export default function ConnectDeviceScreen() {
                 flexDirection: 'row',
                 padding: theme.spacing.xs,
                 gap: theme.spacing.xs,
-                borderRadius: theme.radius.lg,
+                borderRadius: theme.radius.md,
                 backgroundColor: theme.colors.surface,
                 borderWidth: 1,
                 borderColor: theme.colors.border,
@@ -112,7 +95,7 @@ export default function ConnectDeviceScreen() {
                       justifyContent: 'center',
                       gap: theme.spacing.xs,
                       minHeight: 44,
-                      borderRadius: theme.radius.md,
+                      borderRadius: theme.radius.sm + 2,
                       backgroundColor: selected ? theme.colors.accent : 'transparent',
                     }}
                   >

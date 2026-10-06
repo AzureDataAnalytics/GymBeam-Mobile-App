@@ -46,7 +46,7 @@ export default function LoginScreen() {
       <View style={{ flex: 1, paddingTop: theme.spacing.xxl }}>
         <AuthLogo />
 
-        <View style={{ gap: theme.spacing.xl, marginTop: theme.spacing.xxxl }}>
+        <View style={{ gap: theme.spacing.lg, marginTop: theme.spacing.xxl }}>
           <Controller
             control={control}
             name="email"
@@ -100,7 +100,9 @@ export default function LoginScreen() {
           href="/(auth)/forgot-password"
           style={{ alignSelf: 'flex-end', marginTop: theme.spacing.md }}
         >
-          <Text color="link">Forgot Password?</Text>
+          <Text variant="caption" color="link" style={{ fontWeight: '500' }}>
+            Forgot Password?
+          </Text>
         </Link>
 
         {error ? (
@@ -125,12 +127,14 @@ export default function LoginScreen() {
             flexDirection: 'row',
             justifyContent: 'center',
             gap: theme.spacing.sm,
-            marginTop: theme.spacing.xl,
+            marginTop: theme.spacing.lg,
           }}
         >
-          <Text>You don’t have an account?</Text>
+          <Text variant="caption">You don’t have an account?</Text>
           <Link href="/(auth)/register" replace>
-            <Text color="link">Sign Up</Text>
+            <Text variant="caption" color="link" style={{ fontWeight: '600' }}>
+              Sign Up
+            </Text>
           </Link>
         </View>
 
