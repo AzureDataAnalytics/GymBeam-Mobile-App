@@ -23,11 +23,14 @@ export function CreateExerciseScreen({
 }: CreateExerciseScreenProps) {
   const theme = useTheme();
   const connectionState = useDeviceStore((state) => state.connectionState);
+  const sessionState = useDeviceStore((state) => state.sessionState);
   const sendDrill = useDeviceStore((state) => state.sendDrill);
+  const stopDrill = useDeviceStore((state) => state.stopDrill);
   const [targets, setTargets] = useState<TargetPoint[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const selected = selectedIndex === null ? undefined : targets[selectedIndex];
+  const isRunning = connectionState === 'busy' || sessionState === 'running';
 
   const addTarget = (point: TargetPoint) => {
     setTargets((current) => [...current, point]);
@@ -45,13 +48,6 @@ export function CreateExerciseScreen({
   };
 
   const startDrill = async () => {
-    if (connectionState === 'busy') {
-      Alert.alert(
-        'Drill already running',
-        'Wait for the current drill to finish, or stop it first.',
-      );
-      return;
-    }
     if (connectionState !== 'ready') {
       router.push({ pathname: '/devices/connect', params: { from: 'drill' } });
       return;
@@ -60,6 +56,14 @@ export function CreateExerciseScreen({
       await sendDrill({ name: 'Custom drill', targets });
     } catch {
       Alert.alert('Couldn’t start the drill', 'Check the device connection and try again.');
+    }
+  };
+
+  const stopRunningDrill = async () => {
+    try {
+      await stopDrill();
+    } catch {
+      Alert.alert('Couldn’t stop the drill', 'Check the device connection and try again.');
     }
   };
 
@@ -162,14 +166,24 @@ export function CreateExerciseScreen({
             />
           </View>
           <View style={{ flex: 2 }}>
-            <Button
-              label="Start a Drill"
-              variant="accent"
-              size="lg"
-              onPress={startDrill}
-              disabled={targets.length === 0}
-              fullWidth
-            />
+            {isRunning ? (
+              <Button
+                label="Stop Drill"
+                variant="danger"
+                size="lg"
+                onPress={stopRunningDrill}
+                fullWidth
+              />
+            ) : (
+              <Button
+                label="Start a Drill"
+                variant="accent"
+                size="lg"
+                onPress={startDrill}
+                disabled={targets.length === 0}
+                fullWidth
+              />
+            )}
           </View>
         </View>
       </View>
