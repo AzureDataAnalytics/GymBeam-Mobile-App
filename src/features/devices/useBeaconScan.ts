@@ -12,16 +12,23 @@ export type BeaconScanStatus =
   'idle' | 'starting' | 'scanning' | 'permission-denied' | BeaconScanErrorCode;
 
 const FLUSH_INTERVAL_MS = 600;
-const STALE_AFTER_MS = 8000;
+const STALE_AFTER_MS = 25000;
+const EMPTY_HINT_AFTER_MS = 6000;
 
 function sortBeacons(beacons: DiscoveredBeacon[]): DiscoveredBeacon[] {
-  return [...beacons].sort((a, b) => Number(b.isGymBeam) - Number(a.isGymBeam) || b.rssi - a.rssi);
+  return [...beacons].sort(
+    (a, b) =>
+      Number(b.isGymBeam) - Number(a.isGymBeam) ||
+      Number(b.name !== null) - Number(a.name !== null) ||
+      (b.rssi ?? -Infinity) - (a.rssi ?? -Infinity),
+  );
 }
 
 export function useBeaconScan() {
   const [scanner] = useState(createBeaconScanner);
   const [status, setStatus] = useState<BeaconScanStatus>('idle');
   const [beacons, setBeacons] = useState<DiscoveredBeacon[]>([]);
+  const [isQuiet, setIsQuiet] = useState(false);
 
   const seen = useRef(new Map<string, { beacon: DiscoveredBeacon; at: number }>());
   const flushTimer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -37,6 +44,7 @@ export function useBeaconScan() {
     setStatus('starting');
     seen.current.clear();
     setBeacons([]);
+    setIsQuiet(false);
 
     const granted = await requestAndroidBluetoothPermissions();
     if (!granted) {
@@ -46,7 +54,20 @@ export function useBeaconScan() {
 
     try {
       await scanner.start(
-        (beacon) => seen.current.set(beacon.address, { beacon, at: Date.now() }),
+        (beacon) => {
+          const known = seen.current.get(beacon.address)?.beacon;
+          const merged = known
+            ? {
+                ...beacon,
+                name: beacon.name ?? known.name,
+                rssi: beacon.rssi ?? known.rssi,
+                isGymBeam: beacon.isGymBeam || known.isGymBeam,
+                isPaired: beacon.isPaired || known.isPaired,
+                hasBleLink: beacon.hasBleLink || known.hasBleLink,
+              }
+            : beacon;
+          seen.current.set(beacon.address, { beacon: merged, at: Date.now() });
+        },
         (error) => {
           scanner.stop();
           setStatus(error.code);
@@ -57,8 +78,13 @@ export function useBeaconScan() {
       return;
     }
 
+    const startedAt = Date.now();
     if (flushTimer.current) clearInterval(flushTimer.current);
     flushTimer.current = setInterval(() => {
+      const heardAny = Array.from(seen.current.values()).some(
+        ({ beacon }) => beacon.rssi !== null || !beacon.isPaired,
+      );
+      setIsQuiet(!heardAny && Date.now() - startedAt >= EMPTY_HINT_AFTER_MS);
       const cutoff = Date.now() - STALE_AFTER_MS;
       for (const [address, entry] of seen.current) {
         if (entry.at < cutoff) seen.current.delete(address);
@@ -73,5 +99,5 @@ export function useBeaconScan() {
     return stop;
   }, [start, stop]);
 
-  return { status, beacons, start, stop, isMock: scanner.isMock };
+  return { status, beacons, isQuiet, start, stop, isMock: scanner.isMock };
 }

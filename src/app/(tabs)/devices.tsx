@@ -13,7 +13,8 @@ export default function DevicesScreen() {
   const isMock = useDeviceStore((state) => state.transport.isMock);
   const pairedMacAddress = useDeviceStore((state) => state.pairedMacAddress);
   const wifiAddress = useDeviceStore((state) => state.wifiAddress);
-  const hasDevice = Boolean(pairedMacAddress || wifiAddress);
+  const bleDeviceId = useDeviceStore((state) => state.bleDeviceId);
+  const hasDevice = Boolean(pairedMacAddress || wifiAddress || bleDeviceId);
   const latestMetrics = useDeviceStore((state) => state.latestMetrics);
 
   const isBusy = connectionState === 'connecting';
@@ -40,7 +41,9 @@ export default function DevicesScreen() {
                   ? 'Simulated device'
                   : wifiAddress
                     ? `Wi-Fi · ${wifiAddress}`
-                    : (pairedMacAddress ?? 'No device paired')}
+                    : bleDeviceId
+                      ? 'Bluetooth Low Energy'
+                      : (pairedMacAddress ?? 'No device paired')}
               </Text>
             </View>
             <Badge
@@ -113,8 +116,6 @@ export default function DevicesScreen() {
             fullWidth
           />
         ) : null}
-
-      
       </View>
     </Screen>
   );

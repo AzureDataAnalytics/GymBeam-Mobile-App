@@ -2,6 +2,7 @@ import { Platform } from 'react-native';
 
 import { env } from '@/constants/env';
 
+import { BleTransport } from './BleTransport';
 import { BluetoothClassicTransport } from './BluetoothClassicTransport';
 import { MockDeviceTransport } from './MockDeviceTransport';
 import type { DeviceTransport } from './types';
@@ -9,6 +10,7 @@ import { WifiTransport } from './WifiTransport';
 
 export type DeviceLink = {
   macAddress?: string | null;
+  bleDeviceId?: string | null;
   wifiAddress?: string | null;
 };
 
@@ -16,6 +18,8 @@ export function createDeviceTransport(link: DeviceLink = {}): DeviceTransport {
   if (env.enableMockDevice) return new MockDeviceTransport();
 
   if (link.wifiAddress) return new WifiTransport(link.wifiAddress);
+
+  if (link.bleDeviceId && Platform.OS !== 'web') return new BleTransport(link.bleDeviceId);
 
   if (Platform.OS === 'ios' || !link.macAddress) return new MockDeviceTransport();
 

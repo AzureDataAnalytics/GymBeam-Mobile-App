@@ -1,7 +1,11 @@
 import { Platform } from 'react-native';
-import { BleErrorCode, BleManager, ScanMode, State, type Device } from 'react-native-ble-plx';
+import { BleErrorCode, type BleManager, ScanMode, State, type Device } from 'react-native-ble-plx';
+import RNBluetoothClassic, { type BluetoothDevice } from 'react-native-bluetooth-classic';
 
 import { env } from '@/constants/env';
+import { getBleManager, peekBleManager } from '@/services/device-transport/bleManager';
+import { GYMBEAM_BLE_SERVICE_UUID } from '@/services/device-transport/bleProtocol';
+import { isBluetoothClassicAvailable } from '@/services/device-transport/nativeBluetooth';
 import { createLogger } from '@/utils/logger';
 
 import {
@@ -17,11 +21,13 @@ const logger = createLogger('device.beaconScanner');
 export type DiscoveredBeacon = {
   address: string;
   name: string | null;
-  kind: 'ibeacon' | 'eddystone' | 'named';
+  kind: 'ibeacon' | 'eddystone' | 'named' | 'ble' | 'classic';
   identity: string | null;
-  rssi: number;
+  rssi: number | null;
   distanceMeters: number | null;
   isGymBeam: boolean;
+  isPaired?: boolean;
+  hasBleLink?: boolean;
 };
 
 export type BeaconScanErrorCode =
@@ -49,6 +55,14 @@ export type BeaconScanner = {
 const GYMBEAM_NAME = /gym\s?beam/i;
 
 function toBeacon(device: Device): DiscoveredBeacon | null {
+  const beacon = describeDevice(device);
+  const hasBleLink = (device.serviceUUIDs ?? []).some((uuid) =>
+    isSameUuid(uuid, GYMBEAM_BLE_SERVICE_UUID),
+  );
+  return beacon && hasBleLink ? { ...beacon, hasBleLink, isGymBeam: true } : beacon;
+}
+
+function describeDevice(device: Device): DiscoveredBeacon | null {
   if (device.rssi === null) return null;
   const name = device.localName ?? device.name;
   const namedGymBeam = name !== null && GYMBEAM_NAME.test(name);
@@ -92,21 +106,66 @@ function toBeacon(device: Device): DiscoveredBeacon | null {
     };
   }
 
-  return null;
+  return {
+    address: device.id,
+    name,
+    kind: 'ble',
+    identity: null,
+    rssi: device.rssi,
+    distanceMeters: null,
+    isGymBeam: false,
+  };
 }
 
-let sharedManager: BleManager | null = null;
+function fromClassicDevice(device: BluetoothDevice, isPaired = false): DiscoveredBeacon {
+  const name = device.name && device.name !== device.address ? device.name : null;
+  const rssi = Number((device.extra as { rssi?: unknown } | undefined)?.rssi);
+  return {
+    address: device.address,
+    name,
+    kind: 'classic',
+    identity: null,
+    rssi: Number.isFinite(rssi) && rssi < 0 && rssi > -128 ? rssi : null,
+    distanceMeters: null,
+    isGymBeam: name !== null && GYMBEAM_NAME.test(name),
+    isPaired: isPaired || Boolean(device.bonded),
+  };
+}
+
+const DISCOVERY_RETRY_MS = 1500;
+const STATE_SETTLE_TIMEOUT_MS = 3000;
+
+async function settledState(manager: BleManager): Promise<State> {
+  const current = await manager.state();
+  if (current !== State.Unknown && current !== State.Resetting) return current;
+
+  return new Promise((resolve) => {
+    let subscription: { remove(): void } | null = null;
+    const timer = setTimeout(() => {
+      subscription?.remove();
+      resolve(current);
+    }, STATE_SETTLE_TIMEOUT_MS);
+    subscription = manager.onStateChange((next) => {
+      if (next === State.Unknown || next === State.Resetting) return;
+      clearTimeout(timer);
+      subscription?.remove();
+      resolve(next);
+    }, true);
+  });
+}
 
 class BleBeaconScanner implements BeaconScanner {
   readonly isMock = false;
+  private discoveryRun = 0;
+  private discoverySubscription: { remove(): void } | null = null;
 
   async start(
     onBeacon: (beacon: DiscoveredBeacon) => void,
     onError: (error: BeaconScanError) => void,
   ): Promise<void> {
-    const manager = (sharedManager ??= new BleManager());
+    const manager = getBleManager();
 
-    const state = await manager.state();
+    const state = await settledState(manager);
     if (state === State.PoweredOff) {
       throw new BeaconScanError('bluetooth-off', 'Bluetooth is turned off on this phone.');
     }
@@ -118,7 +177,7 @@ class BleBeaconScanner implements BeaconScanner {
     }
 
     await manager.startDeviceScan(
-      null,
+      Platform.OS === 'ios' ? [GYMBEAM_BLE_SERVICE_UUID] : null,
       { scanMode: ScanMode.LowLatency, allowDuplicates: true },
       (error, device) => {
         if (error) {
@@ -127,14 +186,49 @@ class BleBeaconScanner implements BeaconScanner {
           return;
         }
         const beacon = device ? toBeacon(device) : null;
-        // With a configured UUID, anything that isn't a GymBeam unit is noise.
-        if (beacon && (beacon.isGymBeam || !env.beaconUuid)) onBeacon(beacon);
+        if (beacon) onBeacon(beacon);
       },
     );
+
+    if (isBluetoothClassicAvailable) void this.discoverClassicDevices(onBeacon);
+    else logger.warn('Bluetooth Classic native module is missing; scanning BLE only');
   }
 
   stop(): void {
-    sharedManager?.stopDeviceScan().catch(() => {});
+    peekBleManager()
+      ?.stopDeviceScan()
+      .catch(() => {});
+    this.discoveryRun += 1;
+    this.discoverySubscription?.remove();
+    this.discoverySubscription = null;
+    try {
+      if (isBluetoothClassicAvailable) RNBluetoothClassic.cancelDiscovery().catch(() => {});
+    } catch {
+    }
+  }
+
+  private async discoverClassicDevices(onBeacon: (beacon: DiscoveredBeacon) => void) {
+    const run = (this.discoveryRun += 1);
+    this.discoverySubscription?.remove();
+    this.discoverySubscription = RNBluetoothClassic.onDeviceDiscovered(({ device }) =>
+      onBeacon(fromClassicDevice(device as BluetoothDevice)),
+    );
+
+    while (run === this.discoveryRun) {
+      try {
+        const paired = await RNBluetoothClassic.getBondedDevices();
+        if (run !== this.discoveryRun) return;
+        paired.forEach((device) => onBeacon(fromClassicDevice(device, true)));
+
+        const devices = await RNBluetoothClassic.startDiscovery();
+        if (run !== this.discoveryRun) return;
+        devices.forEach((device) => onBeacon(fromClassicDevice(device)));
+      } catch (error) {
+        if (run !== this.discoveryRun) return;
+        logger.warn('classic discovery pass failed', { message: (error as Error)?.message });
+        await new Promise((resolve) => setTimeout(resolve, DISCOVERY_RETRY_MS));
+      }
+    }
   }
 }
 
@@ -185,6 +279,6 @@ class MockBeaconScanner implements BeaconScanner {
 }
 
 export function createBeaconScanner(): BeaconScanner {
-  if (Platform.OS !== 'android' || env.enableMockDevice) return new MockBeaconScanner();
+  if (Platform.OS === 'web' || env.enableMockDevice) return new MockBeaconScanner();
   return new BleBeaconScanner();
 }

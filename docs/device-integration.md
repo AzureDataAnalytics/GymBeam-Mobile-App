@@ -60,7 +60,7 @@ server:
    so the app can reflect true hardware state per spec section 16 instead of
    this optimistic compromise.
 
-## Why iOS can't use this
+## Why iOS can't use Bluetooth Classic
 
 iOS's CoreBluetooth framework only exposes BLE GATT services or MFi-certified
 External Accessories to third-party apps — there is no API for opening a
@@ -69,6 +69,56 @@ Pi runs. This is a platform restriction, not a library gap. The legacy
 Flutter app only worked on Android because its Bluetooth code was a
 hand-written Android `MethodChannel`; there was never an iOS implementation.
 `createDeviceTransport.ts` always returns `MockDeviceTransport` on iOS.
+
+## Bluetooth Low Energy link (Android and iPhone)
+
+`BleTransport` (`src/services/device-transport/BleTransport.ts`) carries the
+same JSON commands and events over Bluetooth Low Energy, which iOS does
+allow. **It needs a Pi-side GATT service that the existing firmware does not
+have yet** — until that is added, no unit advertises it and the app behaves
+exactly as before. Not yet run against real hardware.
+
+### What the Pi must provide
+
+A UART-style GATT service (the Nordic UART Service UUIDs, constants in
+`bleProtocol.ts`):
+
+| Role | UUID | Properties |
+| --- | --- | --- |
+| Service | `6e400001-b5a3-f393-e0a9-e50e24dcca9e` | advertised |
+| RX (phone → Pi) | `6e400002-b5a3-f393-e0a9-e50e24dcca9e` | write (with response) |
+| TX (Pi → phone) | `6e400003-b5a3-f393-e0a9-e50e24dcca9e` | notify |
+
+- **Advertise the service UUID** in the advertisement itself (not only in
+  the GATT table). That is how the app recognises a unit, and on iPhone it
+  is the scan filter — a unit that doesn't advertise it is invisible there.
+  A name containing "GymBeam" is recommended.
+- **Both directions are a byte stream**, not one message per packet. A
+  packet holds at most MTU − 3 bytes (the app asks for an MTU of 185, so up
+  to 182 bytes; 20 if negotiation fails), so a JSON message usually spans
+  several writes or notifications. Concatenate the bytes and split on
+  complete top-level JSON objects — the same no-delimiter framing the Pi
+  already uses over Bluetooth Classic. The Pi must chunk its own
+  notifications to the negotiated MTU the same way.
+- **Same protocol on top**: the app sends `Time` right after connecting and
+  expects `device_info`, then `Drill` / `Drill_preview` / `Drill_Stop`, and
+  receives `system_info` / `Drill_result`, exactly as documented above.
+- No pairing/bonding is required by the app.
+
+### How the app uses it
+
+- The Bluetooth scan marks any device advertising the service as a GymBeam
+  (`hasBleLink`). Tapping Connect on one uses `BleTransport`; anything else
+  on Android still goes through pairing and `BluetoothClassicTransport`.
+- On iPhone the scan lists *only* devices advertising the service, since
+  nothing else is connectable there.
+- The chosen unit is saved as `bleDeviceId` (`deviceStorage`). On Android it
+  is the MAC address; on iOS it is a UUID that is only valid on that phone.
+- iOS shows a Bluetooth permission prompt; its text is set through the
+  `react-native-ble-plx` plugin's `bluetoothAlwaysPermission` in `app.json`.
+  That is a native change, so **iOS needs a new build** to pick it up.
+- `bleProtocol.ts` (chunking and UTF-8 reassembly) is unit tested in
+  `tests/unit/bleProtocol.test.ts`.
 
 ## Finding the Pi by its BLE beacon
 
@@ -86,16 +136,18 @@ level if it isn't already (`ensureBonded`, Android shows its own prompt) →
   estimate from signal strength.
 - `src/services/device-discovery/beaconScanner.ts` — the real scanner
   (`react-native-ble-plx`) and a simulated one. The simulated scanner is used
-  on iOS always and on Android when `EXPO_PUBLIC_ENABLE_MOCK_DEVICE=true`,
-  same rule as the transports.
+  when `EXPO_PUBLIC_ENABLE_MOCK_DEVICE=true`.
 - `src/features/devices/useBeaconScan.ts` — permissions, scan lifecycle and
   the list of beacons currently in range.
 
+**What is listed.** Every Bluetooth device in range: the BLE scan runs
+alongside Bluetooth Classic discovery (`react-native-bluetooth-classic`), so
+Classic-only devices show up too. GymBeam units are sorted first and badged.
+
 **Recognising the GymBeam beacon.** Set `EXPO_PUBLIC_BEACON_UUID` to the
-iBeacon proximity UUID the Pi advertises and only that beacon is listed.
-With it unset the app can't tell a GymBeam beacon from any other, so it
-lists every iBeacon/Eddystone beacon in range and marks one as GymBeam only
-if its advertised name contains "GymBeam".
+iBeacon proximity UUID the Pi advertises and that beacon is badged as
+GymBeam. With it unset, a device is badged only if its advertised name
+contains "GymBeam".
 
 ### Assumptions to confirm on real hardware
 
@@ -110,8 +162,9 @@ if its advertised name contains "GymBeam".
    plugin's `neverForLocation` option: Android filters beacon advertisements
    out of scan results for apps that declare it. This is also why the screen
    asks for Location permission and needs Location turned on.
-3. **Android only.** iOS doesn't expose iBeacon frames to this kind of scan,
-   and has no real transport to connect to anyway.
+3. **Beacons are Android only.** iOS doesn't expose iBeacon frames to this
+   kind of scan; iPhones find a unit by its advertised BLE service instead
+   (see "Bluetooth Low Energy link" above).
 4. **New Architecture.** `react-native-ble-plx` doesn't state New
    Architecture support; like `react-native-bluetooth-classic` below it is a
    plain native module, so it is expected to work through the interop layer

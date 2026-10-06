@@ -27,10 +27,12 @@ type DeviceState = {
   latestMetrics: DeviceSystemMetrics | null;
   pairedMacAddress: string | null;
   wifiAddress: string | null;
+  bleDeviceId: string | null;
 
   hydrate: () => Promise<void>;
   setPairedDevice: (address: string | null) => Promise<void>;
   setWifiDevice: (address: string | null) => Promise<void>;
+  setBleDevice: (deviceId: string | null) => Promise<void>;
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   sendDrill: (spec: DrillSpec) => Promise<void>;
@@ -97,6 +99,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => {
     await Promise.all([
       deviceStorage.setPairedMacAddress(link.macAddress),
       deviceStorage.setWifiAddress(link.wifiAddress),
+      deviceStorage.setBleDeviceId(link.bleDeviceId),
     ]);
 
     const nextTransport = createDeviceTransport(link);
@@ -106,6 +109,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => {
       transport: nextTransport,
       pairedMacAddress: link.macAddress,
       wifiAddress: link.wifiAddress,
+      bleDeviceId: link.bleDeviceId,
       connectionState: nextTransport.getConnectionState(),
       sessionState: 'idle',
       telemetryLog: [],
@@ -121,21 +125,29 @@ export const useDeviceStore = create<DeviceState>((set, get) => {
     latestMetrics: null,
     pairedMacAddress: null,
     wifiAddress: null,
+    bleDeviceId: null,
 
     hydrate: async () => {
-      const [wifi, mac] = await Promise.all([
+      const [wifi, ble, mac] = await Promise.all([
         deviceStorage.getWifiAddress(),
+        deviceStorage.getBleDeviceId(),
         deviceStorage.getPairedMacAddress(),
       ]);
       if (wifi) {
         await get().setWifiDevice(wifi);
+      } else if (ble) {
+        await get().setBleDevice(ble);
       } else if (mac) {
         await get().setPairedDevice(mac);
       }
     },
 
-    setPairedDevice: (address) => switchLink({ macAddress: address, wifiAddress: null }),
-    setWifiDevice: (address) => switchLink({ macAddress: null, wifiAddress: address }),
+    setPairedDevice: (address) =>
+      switchLink({ macAddress: address, wifiAddress: null, bleDeviceId: null }),
+    setWifiDevice: (address) =>
+      switchLink({ macAddress: null, wifiAddress: address, bleDeviceId: null }),
+    setBleDevice: (deviceId) =>
+      switchLink({ macAddress: null, wifiAddress: null, bleDeviceId: deviceId }),
 
     connect: () => get().transport.connect(),
     disconnect: () => get().transport.disconnect(),

@@ -1,5 +1,8 @@
-import { Platform } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 import RNBluetoothClassic from 'react-native-bluetooth-classic';
+
+export const isBluetoothClassicAvailable =
+  Platform.OS === 'android' && NativeModules.RNBluetoothClassic != null;
 
 export type BondedDeviceSummary = {
   name: string;

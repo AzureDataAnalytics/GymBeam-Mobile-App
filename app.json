@@ -58,7 +58,12 @@
         }
       ],
       "expo-font",
-      "react-native-ble-plx",
+      [
+        "react-native-ble-plx",
+        {
+          "bluetoothAlwaysPermission": "GymBeam uses Bluetooth to find and connect to your GymBeam unit."
+        }
+      ],
       [
         "expo-build-properties",
         {
