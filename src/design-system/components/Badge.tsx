@@ -5,10 +5,10 @@ import { Text } from './Text';
 
 export type BadgeTone = 'neutral' | 'success' | 'warning' | 'danger' | 'tint';
 
-export interface BadgeProps {
+export type BadgeProps = {
   label: string;
   tone?: BadgeTone;
-}
+};
 
 export function Badge({ label, tone = 'neutral' }: BadgeProps) {
   const theme = useTheme();

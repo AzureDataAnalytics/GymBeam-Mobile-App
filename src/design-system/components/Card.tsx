@@ -3,10 +3,10 @@ import { StyleSheet, View, type ViewProps } from 'react-native';
 
 import { useTheme } from '../theme';
 
-export interface CardProps extends ViewProps {
+export type CardProps = ViewProps & {
   padded?: boolean;
   elevated?: boolean;
-}
+};
 
 export function Card({
   padded = true,

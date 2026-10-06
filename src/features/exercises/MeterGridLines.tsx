@@ -4,13 +4,13 @@ import { useTheme } from '@/design-system';
 
 export const METER_GRID_LABEL_GUTTER = 32;
 
-interface MeterGridLinesProps {
+type MeterGridLinesProps = {
   columns: number;
   rows: number;
   cell: number;
   left: number;
   top: number;
-}
+};
 
 export function MeterGridLines({ columns, rows, cell, left, top }: MeterGridLinesProps) {
   const theme = useTheme();

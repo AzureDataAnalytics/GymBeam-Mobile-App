@@ -2,20 +2,20 @@ import type { TargetPoint } from '@/types/domain';
 
 
 
-export interface RunSample {
+export type RunSample = {
   targets: TargetPoint[];
   targetTimesSeconds: number[];
   speedKmph: { high: number; avg: number; low: number };
-}
+};
 
-export interface RunSessionSummary {
+export type RunSessionSummary = {
   runs: number;
   distanceKm: number;
   activeTimeHours: number;
   avgSpeedKmph: number;
   consistencyPercent: number;
   reflexScore: number;
-}
+};
 
 const BASE_TARGETS: TargetPoint[] = [
   { x: -1, y: 1.3 },

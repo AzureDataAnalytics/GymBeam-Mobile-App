@@ -1,15 +1,15 @@
-export interface IBeaconFrame {
+export type IBeaconFrame = {
   uuid: string;
   major: number;
   minor: number;
   txPowerAt1m: number;
-}
+};
 
-export interface EddystoneUidFrame {
+export type EddystoneUidFrame = {
   namespace: string;
   instance: string;
   txPowerAt1m: number;
-}
+};
 
 export const EDDYSTONE_SERVICE_UUID = '0000feaa-0000-1000-8000-00805f9b34fb';
 

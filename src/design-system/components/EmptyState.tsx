@@ -4,14 +4,13 @@ import { useTheme } from '../theme';
 import { Button } from './Button';
 import { Text } from './Text';
 
-export interface EmptyStateProps {
+export type EmptyStateProps = {
   title: string;
   description?: string;
   actionLabel?: string;
   onAction?: () => void;
-}
+};
 
-/** Shown instead of an empty list — never leave a screen blank with no explanation. */
 export function EmptyState({ title, description, actionLabel, onAction }: EmptyStateProps) {
   const theme = useTheme();
 

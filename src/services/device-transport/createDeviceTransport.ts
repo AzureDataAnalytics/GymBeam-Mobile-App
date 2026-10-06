@@ -7,10 +7,10 @@ import { MockDeviceTransport } from './MockDeviceTransport';
 import type { DeviceTransport } from './types';
 import { WifiTransport } from './WifiTransport';
 
-export interface DeviceLink {
+export type DeviceLink = {
   macAddress?: string | null;
   wifiAddress?: string | null;
-}
+};
 
 export function createDeviceTransport(link: DeviceLink = {}): DeviceTransport {
   if (env.enableMockDevice) return new MockDeviceTransport();

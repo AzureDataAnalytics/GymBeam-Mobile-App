@@ -5,10 +5,10 @@ import { useTheme } from '../theme';
 export type TextVariant =
   'display' | 'title' | 'subtitle' | 'body' | 'bodyStrong' | 'caption' | 'label';
 
-export interface TextProps extends RNTextProps {
+export type TextProps = RNTextProps & {
   variant?: TextVariant;
   color?: 'primary' | 'secondary' | 'inverse' | 'tint' | 'link' | 'danger' | 'success' | 'warning';
-}
+};
 
 const VARIANT_MAP: Record<
   TextVariant,

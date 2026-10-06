@@ -1,9 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Alert, Image, Pressable, View } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 
-import { Button, Text, useTheme } from '@/design-system';
-
-import { FacebookIcon, GoogleIcon } from './ProviderIcons';
+import { Text, useTheme } from '@/design-system';
 
 export function AuthLogo() {
   const theme = useTheme();
@@ -47,49 +45,13 @@ export function PasswordVisibilityToggle({
   );
 }
 
-function showSocialUnavailable(provider: string) {
-  Alert.alert(`${provider} sign-in`, `Signing in with ${provider} isn’t available yet.`);
-}
-
-export function SocialSignInButtons() {
-  const theme = useTheme();
-
-  return (
-    <View>
-      <Text color="secondary" style={{ textAlign: 'center', marginVertical: theme.spacing.md }}>
-        Or Continue with
-      </Text>
-      <View style={{ gap: theme.spacing.xl }}>
-        <Button
-          label="Google"
-          variant="outline"
-          size="lg"
-          icon={<GoogleIcon />}
-          onPress={() => showSocialUnavailable('Google')}
-          fullWidth
-        />
-        <Button
-          label="Facebook"
-          variant="outline"
-          size="lg"
-          icon={<FacebookIcon />}
-          onPress={() => showSocialUnavailable('Facebook')}
-          fullWidth
-        />
-      </View>
-    </View>
-  );
-}
-
-/** Legal notice pinned to the bottom of a scrolling auth screen. */
 export function AuthTermsNotice() {
   const theme = useTheme();
 
   return (
     <View style={{ marginTop: 'auto', paddingTop: theme.spacing.xxxl, gap: theme.spacing.md }}>
       <Text variant="caption" color="secondary" style={{ opacity: 0.6 }}>
-        By continuing with your account, Google or Facebook, you agree to GymBeam’s Terms of
-        Service.
+        By continuing with your account, you agree to GymBeam’s Terms of Service.
       </Text>
       <Text variant="caption" color="secondary" style={{ opacity: 0.6 }}>
         Our{' '}

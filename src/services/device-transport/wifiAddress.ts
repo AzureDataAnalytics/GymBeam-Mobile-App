@@ -2,10 +2,10 @@ export const DEFAULT_WIFI_PORT = 8765;
 export const DEFAULT_SHARED_WIFI_HOST = 'gymbeam.local';
 export const DEFAULT_HOTSPOT_HOST = '192.168.4.1';
 
-export interface WifiEndpoint {
+export type WifiEndpoint = {
   host: string;
   port: number;
-}
+};
 
 const HOSTNAME =
   /^(?=.{1,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/i;

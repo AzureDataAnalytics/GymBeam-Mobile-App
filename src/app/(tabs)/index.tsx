@@ -48,24 +48,13 @@ export default function HomeScreen() {
           </View>
           <View style={{ flex: 1 }}>
             <Button
-              label="Exercises"
+              label="Drill history"
               variant="secondary"
-              onPress={() => router.push('/(tabs)/exercises')}
+              onPress={() => router.push('/(tabs)/history')}
               fullWidth
             />
           </View>
         </View>
-
-        <Card style={{ gap: theme.spacing.xs }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Text variant="subtitle">AI Coach</Text>
-            <Badge label="Coming soon" tone="neutral" />
-          </View>
-          <Text variant="caption" color="secondary">
-            AI-driven insights and recommendations will appear here once the backend AI service is
-            available. See docs/api-integration.md for the planned contract.
-          </Text>
-        </Card>
       </View>
     </Screen>
   );

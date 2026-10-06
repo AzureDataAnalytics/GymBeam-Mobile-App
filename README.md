@@ -1,8 +1,8 @@
 # GymBeam Mobile
 
 React Native / Expo companion app for the GymBeam Raspberry Pi laser-target
-training system. **Current phase is device ↔ app only — there is no backend**
-(that's a deliberate, separate later phase; see `docs/api-integration.md`).
+training system. **The app is device ↔ app only — there is no backend.** Accounts and drill
+history are stored on the phone.
 See `docs/architecture.md` for how this fits together with the Pi firmware,
 and `docs/mobile-build-progress.md` for what's built vs. still open.
 
@@ -51,7 +51,6 @@ is made.
 ```
 src/
   app/                  Expo Router routes ((auth), (tabs), root layout)
-  api/                  httpError.ts only right now (ApiError type) — no HTTP client until the backend phase
   design-system/        Tokens, ThemeProvider, reusable UI primitives
   features/             Feature-specific pure logic (e.g. session state machine)
   services/
@@ -78,6 +77,5 @@ and requires a custom EAS development build (not Expo Go) — see
 - App icon / splash assets are the Expo template defaults, not final brand
   artwork.
 - `LocalAuthService` is a device-only gate (SHA-256 hash, no salt, no
-  cross-device recovery) — adequate for this phase, not real account
-  security. It's meant to be replaced, not extended, once the backend phase
-  starts.
+  cross-device recovery) — adequate for an on-device app, not real account
+  security.

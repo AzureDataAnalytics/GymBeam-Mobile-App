@@ -6,10 +6,10 @@ export type TelemetryListener = (event: TelemetryEvent) => void;
 export type SystemMetricsListener = (metrics: DeviceSystemMetrics) => void;
 export type Unsubscribe = () => void;
 
-export interface DrillSpec {
+export type DrillSpec = {
   name: string;
   targets: TargetPoint[];
-}
+};
 
 /**
  * Transport-agnostic contract for talking to a paired device. The Pi remains
@@ -25,7 +25,7 @@ export interface DrillSpec {
  * iOS has no real implementation yet — CoreBluetooth cannot open classic SPP
  * sockets to third-party accessories. See docs/device-integration.md.
  */
-export interface DeviceTransport {
+export type DeviceTransport = {
   readonly id: string;
   readonly isMock: boolean;
 
@@ -41,7 +41,7 @@ export interface DeviceTransport {
   sendDrill(spec: DrillSpec): Promise<void>;
   previewDrill(spec: DrillSpec): Promise<void>;
   stopDrill(): Promise<void>;
-}
+};
 
 export class DeviceTransportUnavailableError extends Error {
   constructor(reason: string) {

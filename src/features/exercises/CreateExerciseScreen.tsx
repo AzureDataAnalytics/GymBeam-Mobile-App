@@ -11,10 +11,10 @@ import type { TargetPoint } from '@/types/domain';
 import { TargetGrid } from './TargetGrid';
 import { angleFromDevice, distanceFromDevice } from './targetGeometry';
 
-interface CreateExerciseScreenProps {
+type CreateExerciseScreenProps = {
   showBack?: boolean;
   edges?: Edge[];
-}
+};
 
 export function CreateExerciseScreen({
   showBack = false,

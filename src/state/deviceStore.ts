@@ -1,5 +1,10 @@
 import { create } from 'zustand';
 
+import {
+  applyTelemetry,
+  type DrillRecording,
+  startRecording,
+} from '@/features/history/drillRecorder';
 import { nextSessionState } from '@/features/sessions/sessionStateMachine';
 import {
   createDeviceTransport,
@@ -7,13 +12,14 @@ import {
   type DeviceTransport,
   type DrillSpec,
 } from '@/services/device-transport';
+import { useHistoryStore } from '@/state/historyStore';
 import { deviceStorage } from '@/storage/deviceStorage';
 import type { DeviceConnectionState, DeviceSystemMetrics, SessionState } from '@/types/domain';
 import type { TelemetryEvent } from '@/types/telemetry';
 
 const MAX_TELEMETRY_LOG = 200;
 
-interface DeviceState {
+type DeviceState = {
   transport: DeviceTransport;
   connectionState: DeviceConnectionState;
   sessionState: SessionState;
@@ -30,20 +36,41 @@ interface DeviceState {
   sendDrill: (spec: DrillSpec) => Promise<void>;
   stopDrill: () => Promise<void>;
   clearTelemetry: () => void;
-}
+};
 
 type SetState = (
   partial: Partial<DeviceState> | ((state: DeviceState) => Partial<DeviceState>),
 ) => void;
 
+/** The drill just sent, until the transport confirms it with SESSION_STARTED. */
+let pendingDrill: { spec: DrillSpec; isMock: boolean } | null = null;
+let recording: DrillRecording | null = null;
+
+/** Builds a history entry out of a drill's telemetry and saves it when the drill ends. */
+function recordForHistory(event: TelemetryEvent) {
+  if (event.eventType === 'SESSION_STARTED' && pendingDrill) {
+    recording = startRecording({ ...pendingDrill.spec, isMock: pendingDrill.isMock }, event);
+    pendingDrill = null;
+    return;
+  }
+  if (!recording) return;
+
+  const step = applyTelemetry(recording, event);
+  recording = step.recording;
+  if (step.finished) {
+    void useHistoryStore.getState().add(step.finished);
+  }
+}
+
 function attachTransportListeners(transport: DeviceTransport, set: SetState): () => void {
   const unsubState = transport.onStateChange((connectionState) => set({ connectionState }));
-  const unsubTelemetry = transport.onTelemetry((event) =>
+  const unsubTelemetry = transport.onTelemetry((event) => {
+    recordForHistory(event);
     set((state) => ({
       telemetryLog: [event, ...state.telemetryLog].slice(0, MAX_TELEMETRY_LOG),
       sessionState: nextSessionState(state.sessionState, event.eventType),
-    })),
-  );
+    }));
+  });
   const unsubMetrics = transport.onSystemMetrics((latestMetrics) => set({ latestMetrics }));
 
   return () => {
@@ -64,6 +91,8 @@ export const useDeviceStore = create<DeviceState>((set, get) => {
       .transport.disconnect()
       .catch(() => {});
     detachCurrentTransportListeners?.();
+    pendingDrill = null;
+    recording = null;
 
     await Promise.all([
       deviceStorage.setPairedMacAddress(link.macAddress),
@@ -110,7 +139,16 @@ export const useDeviceStore = create<DeviceState>((set, get) => {
 
     connect: () => get().transport.connect(),
     disconnect: () => get().transport.disconnect(),
-    sendDrill: (spec) => get().transport.sendDrill(spec),
+    sendDrill: async (spec) => {
+      const { transport } = get();
+      pendingDrill = { spec, isMock: transport.isMock };
+      try {
+        await transport.sendDrill(spec);
+      } catch (error) {
+        pendingDrill = null;
+        throw error;
+      }
+    },
     stopDrill: () => get().transport.stopDrill(),
     clearTelemetry: () => set({ telemetryLog: [] }),
   };

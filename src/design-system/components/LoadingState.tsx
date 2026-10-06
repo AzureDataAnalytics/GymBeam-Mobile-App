@@ -3,9 +3,9 @@ import { ActivityIndicator, View } from 'react-native';
 import { useTheme } from '../theme';
 import { Text } from './Text';
 
-export interface LoadingStateProps {
+export type LoadingStateProps = {
   label?: string;
-}
+};
 
 export function LoadingState({ label = 'Loading…' }: LoadingStateProps) {
   const theme = useTheme();

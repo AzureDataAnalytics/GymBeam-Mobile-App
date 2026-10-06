@@ -6,12 +6,7 @@ import { View } from 'react-native';
 import { z } from 'zod';
 
 import { Button, Screen, Text, TextField, useTheme } from '@/design-system';
-import {
-  AuthLogo,
-  AuthTermsNotice,
-  PasswordVisibilityToggle,
-  SocialSignInButtons,
-} from '@/features/auth/AuthFormParts';
+import { AuthLogo, AuthTermsNotice, PasswordVisibilityToggle } from '@/features/auth/AuthFormParts';
 import { useAuthStore } from '@/state/authStore';
 
 const schema = z.object({
@@ -125,8 +120,6 @@ export default function LoginScreen() {
           />
         </View>
 
-        <SocialSignInButtons />
-
         <View
           style={{
             flexDirection: 'row',
@@ -138,32 +131,6 @@ export default function LoginScreen() {
           <Text>You don’t have an account?</Text>
           <Link href="/(auth)/register" replace>
             <Text color="link">Sign Up</Text>
-          </Link>
-        </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            gap: theme.spacing.lg,
-            marginTop: theme.spacing.lg,
-          }}
-        >
-          <Link href="/exercises/create">
-            <Text color="link" variant="caption">
-              Preview: Create Drill
-            </Text>
-          </Link>
-          <Link href="/devices/connect">
-            <Text color="link" variant="caption">
-              Preview: Connect Device
-            </Text>
-          </Link>
-          <Link href="/runs/multi-point">
-            <Text color="link" variant="caption">
-              Preview: Multi Point Run
-            </Text>
           </Link>
         </View>
 

@@ -6,12 +6,7 @@ import { View } from 'react-native';
 import { z } from 'zod';
 
 import { Button, Screen, Text, TextField, useTheme } from '@/design-system';
-import {
-  AuthLogo,
-  AuthTermsNotice,
-  PasswordVisibilityToggle,
-  SocialSignInButtons,
-} from '@/features/auth/AuthFormParts';
+import { AuthLogo, AuthTermsNotice, PasswordVisibilityToggle } from '@/features/auth/AuthFormParts';
 import { useAuthStore } from '@/state/authStore';
 
 const schema = z.object({
@@ -138,8 +133,6 @@ export default function RegisterScreen() {
           />
         </View>
 
-        <SocialSignInButtons />
-
         <View
           style={{
             flexDirection: 'row',
@@ -149,7 +142,6 @@ export default function RegisterScreen() {
           }}
         >
           <Text>Already have an account?</Text>
-          {/* `replace` so toggling between login and register doesn't keep growing the stack. */}
           <Link href="/(auth)/login" replace>
             <Text color="link">Sign In</Text>
           </Link>

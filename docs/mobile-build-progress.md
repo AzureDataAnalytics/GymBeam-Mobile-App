@@ -5,9 +5,8 @@ Last updated: 2026-09-21
 ## Scope for this phase
 
 Device ↔ app only. No backend, by explicit project-owner direction — the
-backend is its own later phase. See `docs/api-integration.md` for what that
-means concretely and why (an earlier misstep integrating with a backend that
-turned out to be decommissioned).
+app stores accounts and drill history on the phone. (An earlier misstep
+integrated with a backend that turned out to be decommissioned.)
 
 ## Completed
 
@@ -133,9 +132,10 @@ analytics, AI) are intentionally not started.
   physical Android phone, paired to a real Pi. Project owner has both.
 - Onboarding flow (device calibration, first-exercise walkthrough) — pairing
   itself now exists (`devices/pair.tsx`), but no broader onboarding flow yet.
-- Exercise library, Pattern editor, Analytics, AI Coach — no backend and no
-  local substitute; screens are honest empty states, not mock data.
-- Session results/history screens — not started.
+- Exercise library, Pattern editor, Analytics, AI Coach — not built; their
+  placeholder screens were removed on 2026-10-05.
+- Session history is on-device only (30 days, see `docs/architecture.md`);
+  nothing is backed up, so it is lost if the app is uninstalled.
 - Offline queueing/sync — not applicable yet (nothing to sync to).
 - Notifications — not started.
 - Real company/product identity for `app.json` bundle identifiers, app
@@ -151,6 +151,4 @@ analytics, AI) are intentionally not started.
 then `eas build --profile development --platform android`, install on the
 Android phone, pair the Pi at the OS level, and walk through the "First real
 test" steps in `docs/device-integration.md`. After that succeeds (or
-reveals bugs to fix), continue with onboarding/calibration UI. Backend phase
-(accounts, exercises, patterns, analytics, AI, telemetry ingestion) starts
-only when explicitly asked for — see `docs/api-integration.md`.
+reveals bugs to fix), continue with onboarding/calibration UI.

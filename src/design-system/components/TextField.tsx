@@ -4,12 +4,12 @@ import { TextInput, type TextInputProps, View } from 'react-native';
 import { useTheme } from '../theme';
 import { Text } from './Text';
 
-export interface TextFieldProps extends TextInputProps {
+export type TextFieldProps = TextInputProps & {
   label: string;
   hideLabel?: boolean;
   trailing?: ReactNode;
   errorMessage?: string;
-}
+};
 
 export const TextField = forwardRef<TextInput, TextFieldProps>(function TextField(
   { label, hideLabel = false, trailing, errorMessage, placeholder, style, ...rest },

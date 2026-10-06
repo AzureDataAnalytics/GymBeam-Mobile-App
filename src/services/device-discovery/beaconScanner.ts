@@ -14,7 +14,7 @@ import {
 
 const logger = createLogger('device.beaconScanner');
 
-export interface DiscoveredBeacon {
+export type DiscoveredBeacon = {
   address: string;
   name: string | null;
   kind: 'ibeacon' | 'eddystone' | 'named';
@@ -22,7 +22,7 @@ export interface DiscoveredBeacon {
   rssi: number;
   distanceMeters: number | null;
   isGymBeam: boolean;
-}
+};
 
 export type BeaconScanErrorCode =
   'bluetooth-off' | 'unauthorized' | 'location-off' | 'unsupported' | 'unknown';
@@ -37,14 +37,14 @@ export class BeaconScanError extends Error {
   }
 }
 
-export interface BeaconScanner {
+export type BeaconScanner = {
   readonly isMock: boolean;
   start(
     onBeacon: (beacon: DiscoveredBeacon) => void,
     onError: (error: BeaconScanError) => void,
   ): Promise<void>;
   stop(): void;
-}
+};
 
 const GYMBEAM_NAME = /gym\s?beam/i;
 

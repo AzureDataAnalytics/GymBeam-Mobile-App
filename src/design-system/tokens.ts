@@ -99,7 +99,7 @@ const palette = {
 
 export type ColorScheme = 'light' | 'dark';
 
-export interface SemanticColors {
+export type SemanticColors = {
   background: string;
   surface: string;
   surfaceRaised: string;
@@ -109,14 +109,10 @@ export interface SemanticColors {
   textInverse: string;
   tint: string;
   tintPressed: string;
-  /** High-emphasis call to action (e.g. auth screen submit). */
   accent: string;
   accentPressed: string;
-  /** Text/icons drawn on top of `accent`. */
   onAccent: string;
-  /** Inline text links. */
   link: string;
-  /** Drill target markers and the path between them. */
   target: string;
   success: string;
   warning: string;
@@ -124,9 +120,8 @@ export interface SemanticColors {
   dangerPressed: string;
   overlay: string;
   skeleton: string;
-}
+};
 
-/** Semantic color tokens. Never reference `palette` directly outside this file. */
 export const colors: Record<ColorScheme, SemanticColors> = {
   light: {
     background: palette.neutral[50],
@@ -192,5 +187,4 @@ export const shadow = {
   },
 } as const;
 
-/** Minimum interactive touch target, per WCAG / platform HIG guidance. */
 export const minTouchTarget = 44;

@@ -5,7 +5,7 @@
  * like real cryptographic primitives in tests, just via Node instead of the
  * native module.
  */
-import { createHash, randomUUID as nodeRandomUUID } from 'node:crypto';
+import { createHash, randomFillSync, randomUUID as nodeRandomUUID } from 'node:crypto';
 
 export const CryptoDigestAlgorithm = {
   SHA256: 'SHA-256',
@@ -16,6 +16,11 @@ export async function digestStringAsync(
   data: string,
 ): Promise<string> {
   return createHash('sha256').update(data).digest('hex');
+}
+
+export function getRandomValues<T extends Uint32Array>(typedArray: T): T {
+  randomFillSync(typedArray);
+  return typedArray;
 }
 
 export function randomUUID(): string {

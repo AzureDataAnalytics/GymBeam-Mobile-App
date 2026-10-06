@@ -6,6 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from '@/design-system';
 import { useAuthStore } from '@/state/authStore';
 import { useDeviceStore } from '@/state/deviceStore';
+import { useHistoryStore } from '@/state/historyStore';
 
 function RootNavigator() {
   const theme = useTheme();
@@ -23,11 +24,17 @@ function RootNavigator() {
 export default function RootLayout() {
   const bootstrap = useAuthStore((state) => state.bootstrap);
   const hydrateDevice = useDeviceStore((state) => state.hydrate);
+  const userId = useAuthStore((state) => state.user?.id ?? null);
+  const loadHistory = useHistoryStore((state) => state.load);
 
   useEffect(() => {
     bootstrap();
     hydrateDevice();
   }, [bootstrap, hydrateDevice]);
+
+  useEffect(() => {
+    loadHistory(userId);
+  }, [loadHistory, userId]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

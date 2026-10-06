@@ -4,13 +4,12 @@ import { useTheme } from '../theme';
 import { Button } from './Button';
 import { Text } from './Text';
 
-export interface ErrorStateProps {
+export type ErrorStateProps = {
   title?: string;
   description?: string;
   onRetry?: () => void;
-}
+};
 
-/** Consistent, non-technical error surface. Never render a raw stack trace here. */
 export function ErrorState({
   title = 'Something went wrong',
   description = 'Please try again in a moment.',

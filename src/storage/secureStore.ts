@@ -36,4 +36,5 @@ export const secureStore = {
 export const SECURE_STORE_KEYS = {
   authSession: 'gymbeam.auth.session',
   localUsers: 'gymbeam.auth.localUsers',
+  passwordReset: 'gymbeam.auth.passwordReset',
 } as const;

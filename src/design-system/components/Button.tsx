@@ -8,14 +8,14 @@ import { Text } from './Text';
 export type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'outline' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
-export interface ButtonProps extends Omit<PressableProps, 'style'> {
+export type ButtonProps = Omit<PressableProps, 'style'> & {
   label: string;
   icon?: ReactNode;
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
   fullWidth?: boolean;
-}
+};
 
 const SIZE_MAP: Record<ButtonSize, { paddingVertical: number; paddingHorizontal: number }> = {
   sm: { paddingVertical: 8, paddingHorizontal: 12 },

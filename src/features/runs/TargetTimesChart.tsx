@@ -19,9 +19,9 @@ const PLOT_HEIGHT = 150;
 const LABEL_SPACE = 28; // above the highest point, for its value label
 const SIDE_PADDING = 18;
 
-interface TargetTimesChartProps {
+type TargetTimesChartProps = {
   timesSeconds: number[];
-}
+};
 
 
 export function TargetTimesChart({ timesSeconds }: TargetTimesChartProps) {

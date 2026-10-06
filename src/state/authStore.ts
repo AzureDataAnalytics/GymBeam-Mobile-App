@@ -8,7 +8,7 @@ const logger = createLogger('state.auth');
 
 export type AuthStatus = 'unknown' | 'authenticated' | 'unauthenticated';
 
-interface AuthState {
+type AuthState = {
   status: AuthStatus;
   user: User | null;
   error: string | null;
@@ -17,7 +17,7 @@ interface AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (input: RegisterInput) => Promise<void>;
   logout: () => Promise<void>;
-}
+};
 
 export const useAuthStore = create<AuthState>((set) => ({
   status: 'unknown',

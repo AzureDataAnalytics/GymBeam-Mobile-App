@@ -41,6 +41,15 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="history"
+        options={{
+          title: 'History',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="history" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
@@ -48,7 +57,6 @@ export default function TabsLayout() {
         }}
       />
       {/* Not in the tab bar; still routable (Home links to them). */}
-      <Tabs.Screen name="exercises" options={{ href: null }} />
       <Tabs.Screen name="sessions" options={{ href: null }} />
       <Tabs.Screen name="devices" options={{ href: null }} />
     </Tabs>

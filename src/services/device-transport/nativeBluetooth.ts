@@ -1,10 +1,10 @@
 import { Platform } from 'react-native';
 import RNBluetoothClassic from 'react-native-bluetooth-classic';
 
-export interface BondedDeviceSummary {
+export type BondedDeviceSummary = {
   name: string;
   address: string;
-}
+};
 
 export async function listBondedDevices(): Promise<BondedDeviceSummary[]> {
   if (Platform.OS !== 'android') return [];

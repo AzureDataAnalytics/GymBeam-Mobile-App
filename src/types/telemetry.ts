@@ -51,7 +51,7 @@ export function parseTelemetryEvent(raw: unknown): TelemetryEvent | null {
   return result.success ? result.data : null;
 }
 
-export interface CreateTelemetryEventInput {
+export type CreateTelemetryEventInput = {
   sessionId: string;
   eventType: TelemetryEventType;
   state: string | null;
@@ -59,7 +59,7 @@ export interface CreateTelemetryEventInput {
   targetIndex?: number | null;
   coordinates?: { x: number; y: number } | null;
   metrics?: Record<string, number> | null;
-}
+};
 
 /** Shared factory so every DeviceTransport implementation builds identically-shaped events. */
 export function createTelemetryEvent(input: CreateTelemetryEventInput): TelemetryEvent {

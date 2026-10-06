@@ -1,50 +1,17 @@
-/**
- * Core domain types shared across the app. These describe the target model —
- * some (User, DrillHistoryEntry) map onto data the existing GymBeam Drupal
- * backend already returns; others (Exercise, Pattern, Session, Telemetry)
- * describe a contract that does not exist server-side yet and is documented
- * in docs/api-integration.md. Screens built against the latter must go
- * through the mock adapters in src/services/mock until a real endpoint
- * exists — see src/services/device-transport and src/api.
- */
+/** Core domain types shared across the app. Everything here lives on the phone or the device. */
 
-export interface User {
+export type User = {
   id: string;
   name: string;
   email: string;
   roles: string[];
-}
+};
 
 /** A point in the training area, in meters, relative to device center. See AppConfigData in the legacy Flutter app: an 8m-diameter work area. */
-export interface TargetPoint {
+export type TargetPoint = {
   x: number;
   y: number;
-}
-
-export interface Pattern {
-  id: string;
-  name: string;
-  targets: TargetPoint[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export type ExerciseDifficulty = 'beginner' | 'intermediate' | 'advanced';
-
-export interface Exercise {
-  id: string;
-  name: string;
-  description: string;
-  difficulty: ExerciseDifficulty;
-  estimatedDurationSeconds: number;
-  targetCount: number;
-  sets: number;
-  rounds: number;
-  restSeconds: number;
-  patternId: string;
-  tags: string[];
-  isFavorite: boolean;
-}
+};
 
 /**
  * Device connectivity/hardware state as reported by the transport layer.
@@ -62,16 +29,16 @@ export type DeviceConnectionState =
   | 'emergency_stop'
   | 'unsupported';
 
-export interface DeviceSystemMetrics {
+export type DeviceSystemMetrics = {
   cpuUsagePercent: number;
   memoryUsagePercent: number;
   diskUsagePercent: number;
   temperatureCelsius: number;
   uptimeSeconds: number;
   reportedAt: string;
-}
+};
 
-export interface PairedDevice {
+export type PairedDevice = {
   id: string;
   name: string;
   macAddress: string;
@@ -81,7 +48,7 @@ export interface PairedDevice {
   lastSeenAt: string | null;
   metrics: DeviceSystemMetrics | null;
   isMock: boolean;
-}
+};
 
 /**
  * Session state machine (spec section 16). The mobile UI reflects these but
@@ -101,26 +68,23 @@ export type SessionState =
   | 'disconnected'
   | 'emergency_stop';
 
-export interface SessionResult {
-  sessionId: string;
-  exerciseId: string;
-  startedAt: string;
-  completedAt: string;
-  targetsAttempted: number;
-  targetsCompleted: number;
-  targetsMissed: number;
-  averageTargetTimeMs: number;
-  fastestTargetTimeMs: number | null;
-  slowestTargetTimeMs: number | null;
-  estimatedCaloriesBurned: number | null;
-}
+/** One pass through a drill's targets, as timed by the device. */
+export type DrillRun = {
+  /** Seconds taken to reach each target, in target order. */
+  targetTimesSeconds: number[];
+  missedTargets: number;
+};
 
-export interface DrillHistoryEntry {
+/**
+ * A session holds one run per lap: the Pi repeats the target sequence until
+ * it is stopped, and reports each lap separately.
+ */
+export type DrillSessionRecord = {
   id: string;
   name: string;
-  recordedAt: string;
-  totalPoints: number;
-  durationSeconds: number;
-  intensity: 'low' | 'medium' | 'high';
-  notes: string | null;
-}
+  startedAt: string;
+  endedAt: string;
+  targets: TargetPoint[];
+  runs: DrillRun[];
+  isMock: boolean;
+};

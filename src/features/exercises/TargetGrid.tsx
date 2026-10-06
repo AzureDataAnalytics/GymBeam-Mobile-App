@@ -10,13 +10,13 @@ import { GRID_COLUMNS, GRID_ROWS, findTargetNear, snapToGrid } from './targetGeo
 
 const EDGE_PADDING = 16;
 
-interface TargetGridProps {
+type TargetGridProps = {
   targets: TargetPoint[];
   selectedIndex: number | null;
   onAddTarget: (point: TargetPoint) => void;
   onSelectTarget: (index: number) => void;
   onRemoveTarget: (index: number) => void;
-}
+};
 
 export function TargetGrid({
   targets,
