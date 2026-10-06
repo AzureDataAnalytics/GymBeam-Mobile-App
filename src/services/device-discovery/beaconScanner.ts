@@ -4,7 +4,6 @@ import RNBluetoothClassic, { type BluetoothDevice } from 'react-native-bluetooth
 
 import { env } from '@/constants/env';
 import { getBleManager, peekBleManager } from '@/services/device-transport/bleManager';
-import { GYMBEAM_BLE_SERVICE_UUID } from '@/services/device-transport/bleProtocol';
 import { isBluetoothClassicAvailable } from '@/services/device-transport/nativeBluetooth';
 import { createLogger } from '@/utils/logger';
 
@@ -52,14 +51,11 @@ export type BeaconScanner = {
   stop(): void;
 };
 
-const GYMBEAM_NAME = /gym\s?beam/i;
+const GYMBEAM_NAME = /gym[\s_-]?beam/i;
 
 function toBeacon(device: Device): DiscoveredBeacon | null {
   const beacon = describeDevice(device);
-  const hasBleLink = (device.serviceUUIDs ?? []).some((uuid) =>
-    isSameUuid(uuid, GYMBEAM_BLE_SERVICE_UUID),
-  );
-  return beacon && hasBleLink ? { ...beacon, hasBleLink, isGymBeam: true } : beacon;
+  return beacon?.isGymBeam ? { ...beacon, hasBleLink: true } : beacon;
 }
 
 function describeDevice(device: Device): DiscoveredBeacon | null {
@@ -177,7 +173,7 @@ class BleBeaconScanner implements BeaconScanner {
     }
 
     await manager.startDeviceScan(
-      Platform.OS === 'ios' ? [GYMBEAM_BLE_SERVICE_UUID] : null,
+      null,
       { scanMode: ScanMode.LowLatency, allowDuplicates: true },
       (error, device) => {
         if (error) {
@@ -186,7 +182,7 @@ class BleBeaconScanner implements BeaconScanner {
           return;
         }
         const beacon = device ? toBeacon(device) : null;
-        if (beacon) onBeacon(beacon);
+        if (beacon && (beacon.hasBleLink || Platform.OS !== 'ios')) onBeacon(beacon);
       },
     );
 
@@ -203,8 +199,7 @@ class BleBeaconScanner implements BeaconScanner {
     this.discoverySubscription = null;
     try {
       if (isBluetoothClassicAvailable) RNBluetoothClassic.cancelDiscovery().catch(() => {});
-    } catch {
-    }
+    } catch {}
   }
 
   private async discoverClassicDevices(onBeacon: (beacon: DiscoveredBeacon) => void) {

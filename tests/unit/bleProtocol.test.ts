@@ -1,4 +1,9 @@
-import { BleTextDecoder, encodeBleChunks } from '@/services/device-transport/bleProtocol';
+import {
+  type BleCharacteristicInfo,
+  BleTextDecoder,
+  encodeBleChunks,
+  findBleUartLink,
+} from '@/services/device-transport/bleProtocol';
 import { JsonStreamFramer } from '@/services/device-transport/jsonFraming';
 
 function decodeAll(chunks: string[]): string {
@@ -63,5 +68,80 @@ describe('BleTextDecoder', () => {
       { type: 'system_info', cpuUsage: 12 },
       { type: 'Drill_result', point0: 1.5 },
     ]);
+  });
+});
+
+function characteristic(
+  uuid: string,
+  flags: Partial<Omit<BleCharacteristicInfo, 'uuid'>>,
+): BleCharacteristicInfo {
+  return {
+    uuid,
+    isWritableWithResponse: false,
+    isWritableWithoutResponse: false,
+    isNotifiable: false,
+    isIndicatable: false,
+    ...flags,
+  };
+}
+
+describe('findBleUartLink', () => {
+  const standard = {
+    uuid: '0000180a-0000-1000-8000-00805f9b34fb',
+    characteristics: [
+      characteristic('00002a29-0000-1000-8000-00805f9b34fb', {
+        isWritableWithResponse: true,
+        isNotifiable: true,
+      }),
+    ],
+  };
+
+  it('finds the write and notify characteristics of the custom service', () => {
+    const link = findBleUartLink([
+      standard,
+      {
+        uuid: 'ad1fbe54-5c04-425b-a9d3-22fd2b909804',
+        characteristics: [
+          characteristic('cb11e114-b72d-4fcb-8f79-40d365427d1d', { isNotifiable: true }),
+          characteristic('6b6a6d91-daa6-4b0f-9b18-47a700a2ef2a', { isWritableWithResponse: true }),
+        ],
+      },
+    ]);
+    expect(link).toEqual({
+      serviceUuid: 'ad1fbe54-5c04-425b-a9d3-22fd2b909804',
+      writeUuid: '6b6a6d91-daa6-4b0f-9b18-47a700a2ef2a',
+      writeWithResponse: true,
+      notifyUuid: 'cb11e114-b72d-4fcb-8f79-40d365427d1d',
+    });
+  });
+
+  it('works with any identifiers and write-without-response', () => {
+    const link = findBleUartLink([
+      {
+        uuid: '12345678-1234-1234-1234-123456789abc',
+        characteristics: [
+          characteristic('aaaaaaaa-0000-0000-0000-000000000001', {
+            isWritableWithoutResponse: true,
+          }),
+          characteristic('aaaaaaaa-0000-0000-0000-000000000002', { isIndicatable: true }),
+        ],
+      },
+    ]);
+    expect(link?.writeWithResponse).toBe(false);
+    expect(link?.notifyUuid).toBe('aaaaaaaa-0000-0000-0000-000000000002');
+  });
+
+  it('ignores standard services and services missing either direction', () => {
+    expect(
+      findBleUartLink([
+        standard,
+        {
+          uuid: '12345678-1234-1234-1234-123456789abc',
+          characteristics: [
+            characteristic('aaaaaaaa-0000-0000-0000-000000000001', { isNotifiable: true }),
+          ],
+        },
+      ]),
+    ).toBeNull();
   });
 });

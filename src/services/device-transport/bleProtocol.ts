@@ -1,7 +1,46 @@
+export type BleCharacteristicInfo = {
+  uuid: string;
+  isWritableWithResponse: boolean;
+  isWritableWithoutResponse: boolean;
+  isNotifiable: boolean;
+  isIndicatable: boolean;
+};
 
-export const GYMBEAM_BLE_SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
-export const GYMBEAM_BLE_RX_CHARACTERISTIC_UUID = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
-export const GYMBEAM_BLE_TX_CHARACTERISTIC_UUID = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+export type BleServiceInfo = {
+  uuid: string;
+  characteristics: BleCharacteristicInfo[];
+};
+
+export type BleUartLink = {
+  serviceUuid: string;
+  writeUuid: string;
+  writeWithResponse: boolean;
+  notifyUuid: string;
+};
+
+const STANDARD_SERVICE_UUID = /^0000[0-9a-f]{4}-0000-1000-8000-00805f9b34fb$/i;
+
+export function findBleUartLink(services: BleServiceInfo[]): BleUartLink | null {
+  for (const service of services) {
+    if (STANDARD_SERVICE_UUID.test(service.uuid)) continue;
+
+    const write = service.characteristics.find(
+      (item) => item.isWritableWithResponse || item.isWritableWithoutResponse,
+    );
+    const notify = service.characteristics.find(
+      (item) => (item.isNotifiable || item.isIndicatable) && item.uuid !== write?.uuid,
+    );
+    if (write && notify) {
+      return {
+        serviceUuid: service.uuid,
+        writeUuid: write.uuid,
+        writeWithResponse: write.isWritableWithResponse,
+        notifyUuid: notify.uuid,
+      };
+    }
+  }
+  return null;
+}
 
 export const BLE_ATT_HEADER_BYTES = 3;
 export const BLE_REQUESTED_MTU = 185;
@@ -51,7 +90,6 @@ function sequenceLength(leadByte: number): number {
   // A stray continuation or invalid byte: consume it alone.
   return 1;
 }
-
 
 export class BleTextDecoder {
   private pending: number[] = [];

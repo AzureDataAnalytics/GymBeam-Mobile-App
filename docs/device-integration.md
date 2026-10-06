@@ -75,24 +75,25 @@ hand-written Android `MethodChannel`; there was never an iOS implementation.
 `BleTransport` (`src/services/device-transport/BleTransport.ts`) carries the
 same JSON commands and events over Bluetooth Low Energy, which iOS does
 allow. **It needs a Pi-side GATT service that the existing firmware does not
-have yet** — until that is added, no unit advertises it and the app behaves
-exactly as before. Not yet run against real hardware.
+have yet**. Not yet run against real hardware.
+
+A real unit ("GYM_BEAM", inspected with nRF Connect) already exposes a GATT
+service with one notify and one write characteristic. What is **not** yet confirmed is that it speaks the JSON
+protocol described here over those characteristics.
 
 ### What the Pi must provide
 
-A UART-style GATT service (the Nordic UART Service UUIDs, constants in
-`bleProtocol.ts`):
+A custom GATT service with one characteristic the phone can write to and
+one that notifies. **The UUIDs can be anything**: after connecting, the app
+reads the unit's services and uses the first non-standard service that has
+both (`findBleUartLink` in `bleProtocol.ts`). On the unit inspected these
+were service `ad1fbe54-5c04-425b-a9d3-22fd2b909804`, notify
+`cb11e114-b72d-4fcb-8f79-40d365427d1d`, write
+`6b6a6d91-daa6-4b0f-9b18-47a700a2ef2a`.
 
-| Role | UUID | Properties |
-| --- | --- | --- |
-| Service | `6e400001-b5a3-f393-e0a9-e50e24dcca9e` | advertised |
-| RX (phone → Pi) | `6e400002-b5a3-f393-e0a9-e50e24dcca9e` | write (with response) |
-| TX (Pi → phone) | `6e400003-b5a3-f393-e0a9-e50e24dcca9e` | notify |
-
-- **Advertise the service UUID** in the advertisement itself (not only in
-  the GATT table). That is how the app recognises a unit, and on iPhone it
-  is the scan filter — a unit that doesn't advertise it is invisible there.
-  A name containing "GymBeam" is recommended.
+- **Be recognisable in the advertisement**: a name matching "GymBeam"
+  (`GYM_BEAM`, `GymBeam`, `Gym Beam` all match). That is how the app decides
+  a device is a BLE-capable unit, and on iPhone nothing else is listed.
 - **Both directions are a byte stream**, not one message per packet. A
   packet holds at most MTU − 3 bytes (the app asks for an MTU of 185, so up
   to 182 bytes; 20 if negotiation fails), so a JSON message usually spans
@@ -107,11 +108,12 @@ A UART-style GATT service (the Nordic UART Service UUIDs, constants in
 
 ### How the app uses it
 
-- The Bluetooth scan marks any device advertising the service as a GymBeam
-  (`hasBleLink`). Tapping Connect on one uses `BleTransport`; anything else
-  on Android still goes through pairing and `BluetoothClassicTransport`.
-- On iPhone the scan lists *only* devices advertising the service, since
-  nothing else is connectable there.
+- The Bluetooth scan marks any device heard over BLE with a GymBeam name as
+  BLE-capable (`hasBleLink`). Tapping Connect on one
+  uses `BleTransport`; anything else on Android still goes through pairing
+  and `BluetoothClassicTransport`.
+- On iPhone the scan lists *only* those devices, since nothing else is
+  connectable there.
 - The chosen unit is saved as `bleDeviceId` (`deviceStorage`). On Android it
   is the MAC address; on iOS it is a UUID that is only valid on that phone.
 - iOS shows a Bluetooth permission prompt; its text is set through the

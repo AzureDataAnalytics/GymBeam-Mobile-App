@@ -10,10 +10,9 @@ import {
   BLE_MIN_CHUNK_BYTES,
   BLE_REQUESTED_MTU,
   BleTextDecoder,
+  type BleUartLink,
   encodeBleChunks,
-  GYMBEAM_BLE_RX_CHARACTERISTIC_UUID,
-  GYMBEAM_BLE_SERVICE_UUID,
-  GYMBEAM_BLE_TX_CHARACTERISTIC_UUID,
+  findBleUartLink,
 } from './bleProtocol';
 import { JsonStreamFramer } from './jsonFraming';
 import {
@@ -61,6 +60,7 @@ export class BleTransport implements DeviceTransport {
   private framer = new JsonStreamFramer();
   private decoder = new BleTextDecoder();
   private device: Device | null = null;
+  private link: BleUartLink | null = null;
   private chunkBytes = BLE_MIN_CHUNK_BYTES;
   private dataSubscription: Subscription | null = null;
   private disconnectSubscription: Subscription | null = null;
@@ -91,9 +91,17 @@ export class BleTransport implements DeviceTransport {
         Math.min(device.mtu, BLE_REQUESTED_MTU) - BLE_ATT_HEADER_BYTES,
       );
 
+      const link = await readUartLink(device);
+      if (!link) {
+        throw new DeviceTransportUnavailableError(
+          'This device has no Bluetooth service the app can send drills to.',
+        );
+      }
+      this.link = link;
+
       this.dataSubscription = device.monitorCharacteristicForService(
-        GYMBEAM_BLE_SERVICE_UUID,
-        GYMBEAM_BLE_TX_CHARACTERISTIC_UUID,
+        link.serviceUuid,
+        link.notifyUuid,
         (error, characteristic) => {
           // A monitor error means the link dropped; onDisconnected reports that.
           if (error || !characteristic?.value) return;
@@ -201,15 +209,25 @@ export class BleTransport implements DeviceTransport {
 
   private write(message: string): Promise<void> {
     const device = this.requireConnectedDevice();
+    const link = this.link;
+    if (!link) throw new DeviceTransportUnavailableError('Not connected to a device.');
     const chunks = encodeBleChunks(message, this.chunkBytes);
 
     const send = async () => {
       for (const chunk of chunks) {
-        await device.writeCharacteristicWithResponseForService(
-          GYMBEAM_BLE_SERVICE_UUID,
-          GYMBEAM_BLE_RX_CHARACTERISTIC_UUID,
-          chunk,
-        );
+        if (link.writeWithResponse) {
+          await device.writeCharacteristicWithResponseForService(
+            link.serviceUuid,
+            link.writeUuid,
+            chunk,
+          );
+        } else {
+          await device.writeCharacteristicWithoutResponseForService(
+            link.serviceUuid,
+            link.writeUuid,
+            chunk,
+          );
+        }
       }
     };
 
@@ -289,4 +307,15 @@ export class BleTransport implements DeviceTransport {
     const event = createTelemetryEvent({ sessionId, eventType, state: this.state, ...partial });
     this.telemetryListeners.forEach((listener) => listener(event));
   }
+}
+
+async function readUartLink(device: Device): Promise<BleUartLink | null> {
+  const services = await device.services();
+  const described = await Promise.all(
+    services.map(async (service) => ({
+      uuid: service.uuid,
+      characteristics: await service.characteristics(),
+    })),
+  );
+  return findBleUartLink(described);
 }
