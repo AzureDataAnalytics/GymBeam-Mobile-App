@@ -104,6 +104,25 @@ export class LocalAuthService implements AuthService {
     return secureStore.getJSON<AuthSession>(SECURE_STORE_KEYS.authSession);
   }
 
+  async updateName(fullName: string): Promise<AuthSession> {
+    const current = await this.restoreSession();
+    if (!current) {
+      throw new AuthError('Sign in again to change your name.');
+    }
+
+    const name = fullName.trim();
+    const table = await this.getUserTable();
+    const entry = Object.entries(table).find(([, user]) => user.id === current.user.id);
+    if (entry) {
+      table[entry[0]] = { ...entry[1], fullName: name };
+      await secureStore.setJSON(SECURE_STORE_KEYS.localUsers, table);
+    }
+
+    const session: AuthSession = { user: { ...current.user, name } };
+    await secureStore.setJSON(SECURE_STORE_KEYS.authSession, session);
+    return session;
+  }
+
   async requestPasswordReset(email: string): Promise<void> {
     const record = findByEmail(await this.getUserTable(), email);
     if (!record) {
@@ -186,7 +205,6 @@ async function hashPassword(password: string): Promise<string> {
   return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, password);
 }
 
-/** Six digits, from the platform's secure random source. */
 function generateResetCode(): string {
   const [value] = Crypto.getRandomValues(new Uint32Array(1));
   return String((value ?? 0) % 1_000_000).padStart(6, '0');

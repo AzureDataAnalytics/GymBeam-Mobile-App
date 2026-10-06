@@ -17,6 +17,7 @@ type AuthState = {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (input: RegisterInput) => Promise<void>;
   logout: () => Promise<void>;
+  updateName: (fullName: string) => Promise<void>;
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -37,7 +38,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ status: 'authenticated', user: session.user, isSubmitting: false });
     } catch (error) {
       logger.warn('login failed', { message: (error as Error)?.message });
-      set({ isSubmitting: false, error: 'We couldn’t sign you in. Check your details and try again.' });
+      set({
+        isSubmitting: false,
+        error: 'We couldn’t sign you in. Check your details and try again.',
+      });
       throw error;
     }
   },
@@ -57,5 +61,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: async () => {
     await authService.logout();
     set({ status: 'unauthenticated', user: null });
+  },
+
+  updateName: async (fullName) => {
+    const session = await authService.updateName(fullName);
+    set({ user: session.user });
   },
 }));

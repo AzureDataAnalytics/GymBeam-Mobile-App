@@ -107,6 +107,27 @@ describe('LocalAuthService', () => {
     await auth.logout();
     expect(await auth.restoreSession()).toBeNull();
   });
+
+  it('renames the signed-in account, and the new name survives signing in again', async () => {
+    await auth.register({
+      fullName: 'Trainee 5',
+      email: 't5@example.com',
+      password: 'pw12345',
+    });
+    await auth.login({ email: 't5@example.com', password: 'pw12345' });
+
+    const updated = await auth.updateName('  Renamed Trainee ');
+    expect(updated.user.name).toBe('Renamed Trainee');
+    expect((await auth.restoreSession())?.user.name).toBe('Renamed Trainee');
+
+    await auth.logout();
+    const session = await auth.login({ email: 't5@example.com', password: 'pw12345' });
+    expect(session.user.name).toBe('Renamed Trainee');
+  });
+
+  it('refuses to rename when nobody is signed in', async () => {
+    await expect(auth.updateName('Someone')).rejects.toBeInstanceOf(AuthError);
+  });
 });
 
 describe('LocalAuthService password reset', () => {

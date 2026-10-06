@@ -21,7 +21,6 @@ export type AuthSession = {
   user: User;
 };
 
-/** Thrown by an AuthService with a message that is safe to show the user. */
 export class AuthError extends Error {
   constructor(message: string) {
     super(message);
@@ -34,7 +33,7 @@ export type AuthService = {
   register(input: RegisterInput): Promise<void>;
   logout(): Promise<void>;
   restoreSession(): Promise<AuthSession | null>;
-  /** Emails a one-time code that resetPassword() will accept for a short while. */
+  updateName(fullName: string): Promise<AuthSession>;
   requestPasswordReset(email: string): Promise<void>;
   resetPassword(input: ResetPasswordInput): Promise<void>;
 };
