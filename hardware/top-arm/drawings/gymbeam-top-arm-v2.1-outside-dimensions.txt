@@ -1,0 +1,42 @@
+TOP VIEW: overall X 56.54 x Y 73.40
+FRONT VIEW: overall X 56.54 x Z 56.07
+RIGHT VIEW: overall Y 73.40 x Z 56.07
+Overall model: X 56.54 x Y 73.50 x Z 56.47 mm, volume 38.0 cm³
+Part A: X 56.54 x Y 73.40 x Z 56.07 mm, volume 22.3 cm³
+Part B: X 35.33 x Y 73.38 x Z 46.52 mm, volume 15.6 cm³
+Also 21 very small round features of ⌀0.30 (decorative / detail pattern) - not listed.
+Centre = midpoint of the feature along its axis. Length = extent of the round surface along its axis. R = partial arc (radius), ⌀ = full circle (diameter).
+
+ID | Type | Size | Dia | Length | Axis | X | Y | Z | Part
+H1 | Hole | ⌀1.70 | 1.70 | 6.15 | Z | 19.79 | 55.40 | 43.89 | Part A
+H2 | Hole | ⌀1.70 | 1.70 | 6.15 | Z | 50.29 | 55.40 | 43.89 | Part A
+H3 | Hole | ⌀1.70 | 1.70 | 5.10 | angled (0.73, -0.00, -0.68) | 40.89 | 41.18 | 39.68 | Part A
+H4 | Hole | ⌀1.70 | 1.70 | 6.62 | Z | 24.54 | 20.09 | 47.07 | Part A
+H5 | Hole | ⌀1.70 | 1.70 | 6.62 | Z | 45.54 | 20.09 | 47.07 | Part A
+H6 | Hole | ⌀1.70 | 1.70 | 2.00 | X | 4.50 | 26.78 | 30.07 | Part A
+H7 | Hole | ⌀1.70 | 1.70 | 5.00 | X | 50.85 | 39.33 | 40.88 | Part A
+H8 | Hole | ⌀1.70 | 1.70 | 4.50 | Z | 35.04 | 11.54 | 49.72 | Part A
+H9 | Hole | ⌀1.70 | 1.70 | 11.19 | angled (-0.23, 0.33, 0.92) | 24.23 | 46.31 | 11.07 | Part A
+H10 | Hole | ⌀1.70 | 1.70 | 4.00 | angled (0.00, 0.13, 0.99) | 35.04 | 66.58 | 52.14 | Part A
+H11 | Hole | ⌀2.40 | 2.40 | 1.30 | X | 54.89 | 39.33 | 40.88 | Part B
+H12 | Hole | ⌀2.50 | 2.50 | 1.20 | angled (-0.23, 0.33, 0.92) | 25.80 | 43.98 | 4.67 | Part B
+H13 | Concave arc | R1.72 | 3.45 | 9.00 | Z | 40.04 | 15.81 | 51.97 | Part A
+H14 | Concave arc | R1.72 | 3.45 | 9.00 | Z | 30.04 | 15.81 | 51.97 | Part A
+H15 | Outer round | R2.00 | 4.00 | 8.00 | Z | 32.87 | 13.39 | 51.47 | Part A
+H16 | Outer round | R2.00 | 4.00 | 8.00 | Z | 37.21 | 13.39 | 51.47 | Part A
+H17 | Hole | ⌀4.00 | 4.00 | 1.20 | Z | 35.04 | 40.38 | 54.07 | Part A
+H18 | Concave arc | R2.30 | 4.60 | 3.50 | X | 1.75 | 26.78 | 30.07 | Part A
+H19 | Hole | ⌀5.00 | 5.00 | 12.04 | X | 11.52 | 26.78 | 30.07 | Part A
+H20 | Concave arc | R3.08 | 6.16 | 8.50 | Z | 35.04 | 40.38 | 48.22 | Part A
+H21 | Outer round | R3.90 | 7.80 | 1.91 | angled (-0.23, 0.33, 0.92) | 25.88 | 43.86 | 4.34 | Part B
+H22 | Pin / boss | ⌀9.80 | 9.80 | 5.47 | X | 2.74 | 26.78 | 30.07 | Part A
+H23 | Outer round | R5.07 | 10.15 | 3.32 | X | 15.20 | 8.88 | 27.99 | Part A
+H24 | Outer round | R15.50 | 31.00 | 2.00 | X | 14.54 | 26.78 | 30.07 | Part A
+H25 | Concave arc | R19.66 | 39.31 | 24.95 | X | 36.05 | 21.99 | 29.03 | Part B
+H26 | Concave arc | R19.77 | 39.54 | 24.94 | X | 36.05 | 51.35 | 22.47 | Part B
+H27 | Concave arc | R20.16 | 40.31 | 1.00 | X | 23.08 | 21.99 | 29.03 | Part B
+H28 | Concave arc | R20.27 | 40.54 | 1.03 | X | 23.06 | 51.35 | 22.47 | Part B
+H29 | Concave arc | R21.10 | 42.20 | 6.42 | X | 16.75 | 26.78 | 30.07 | Part A
+H30 | Outer round | R21.96 | 43.91 | 28.24 | X | 35.35 | 21.99 | 29.03 | Part B
+H31 | Outer round | R22.07 | 44.14 | 28.24 | X | 35.35 | 51.35 | 22.47 | Part B
+H32 | Outer round | R23.10 | 46.20 | 3.32 | X | 15.20 | 26.78 | 30.07 | Part A
